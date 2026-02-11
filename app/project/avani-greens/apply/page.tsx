@@ -111,6 +111,17 @@ export default function AvaniGreensApplyPage() {
     setStep(3);
   };
 
+  const fileToBase64 = (file: File): Promise<string> =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        const result = reader.result as string;
+        resolve(result.split(",")[1] || "");
+      };
+      reader.onerror = reject;
+    });
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!step2Data.termsAccepted) {
@@ -123,10 +134,40 @@ export default function AvaniGreensApplyPage() {
     setErrorMsg("");
 
     try {
+      const attachments: { filename: string; content: string }[] = [];
+      if (docFiles.aadhaarCard) {
+        attachments.push({
+          filename: `aadhaar_${docFiles.aadhaarCard.file.name}`,
+          content: await fileToBase64(docFiles.aadhaarCard.file),
+        });
+      }
+      if (docFiles.panCard) {
+        attachments.push({
+          filename: `pan_${docFiles.panCard.file.name}`,
+          content: await fileToBase64(docFiles.panCard.file),
+        });
+      }
+      if (docFiles.photo) {
+        attachments.push({
+          filename: `photo_${docFiles.photo.file.name}`,
+          content: await fileToBase64(docFiles.photo.file),
+        });
+      }
+      if (docFiles.cancelledCheque) {
+        attachments.push({
+          filename: `cheque_${docFiles.cancelledCheque.file.name}`,
+          content: await fileToBase64(docFiles.cancelledCheque.file),
+        });
+      }
+
       const res = await fetch("/api/send-lead", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...step1Data, ...step2Data }),
+        body: JSON.stringify({
+          ...step1Data,
+          ...step2Data,
+          attachments,
+        }),
       });
 
       const data = await res.json();

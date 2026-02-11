@@ -49,6 +49,7 @@ export async function POST(request: Request) {
       coApplicantPhone,
       coApplicantAadhar,
       coApplicantPan,
+      attachments,
     } = body;
 
     if (!fullName || !email || !whatsapp) {
@@ -122,14 +123,29 @@ export async function POST(request: Request) {
       }
     }
 
+    if (attachments && attachments.length > 0) {
+      html += `<hr><p><strong>Attached documents:</strong> ${attachments.map((a: { filename: string }) => a.filename).join(", ")}</p>`;
+    }
     html += `<hr><p><em>Sent from Jan Awas Yojna Plots - Avani Greens</em></p>`;
 
-    const { data, error } = await resend.emails.send({
+    const emailPayload: {
+      from: string;
+      to: string[];
+      subject: string;
+      html: string;
+      attachments?: { filename: string; content: string }[];
+    } = {
       from: `Jan Awas Yojna Plots <${FROM_EMAIL}>`,
       to: [TO_EMAIL],
       subject,
       html,
-    });
+    };
+
+    if (attachments && Array.isArray(attachments) && attachments.length > 0) {
+      emailPayload.attachments = attachments;
+    }
+
+    const { data, error } = await resend.emails.send(emailPayload);
 
     if (error) {
       console.error("Resend error:", error);
