@@ -1987,3 +1987,426 @@ a.contact-value:hover {
     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   }
 }
+
+/* Lead Form Modal - Apply Now */
+.lead-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 1rem;
+}
+
+.lead-modal {
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  max-width: 480px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  border-top: 4px solid #3E8310;
+}
+
+.lead-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.lead-modal-title {
+  margin: 0;
+  font-size: 1.375rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.lead-modal-close {
+  background: none;
+  border: none;
+  font-size: 1.75rem;
+  line-height: 1;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 0.25rem;
+  transition: color 0.2s;
+}
+
+.lead-modal-close:hover {
+  color: #1f2937;
+}
+
+.lead-form {
+  padding: 1.5rem;
+}
+
+.lead-form .lead-form-group {
+  margin-bottom: 1.25rem;
+}
+
+.lead-form .lead-form-group label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+
+.lead-form .lead-form-group input,
+.lead-form .lead-form-group textarea {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.625rem 0.75rem;
+  font-size: 0.9375rem;
+  font-family: Arial, Helvetica, sans-serif;
+  line-height: 1.5;
+  color: #1f2937;
+  background-color: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  -webkit-appearance: none;
+  appearance: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.lead-form .lead-form-group input:focus,
+.lead-form .lead-form-group textarea:focus {
+  outline: none;
+  border-color: #3E8310;
+  box-shadow: 0 0 0 2px rgba(62, 131, 16, 0.2);
+}
+
+.lead-form .lead-form-group input::placeholder,
+.lead-form .lead-form-group textarea::placeholder {
+  color: #9ca3af;
+}
+
+.lead-form .lead-form-group textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.lead-form .lead-form-error {
+  color: #dc2626;
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+}
+
+.lead-form .lead-form-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  margin-top: 1.5rem;
+}
+
+.lead-form .lead-btn {
+  padding: 0.5rem 1.25rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  font-family: Arial, Helvetica, sans-serif;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s, opacity 0.2s;
+  border: none;
+}
+
+.lead-form .lead-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.lead-form .lead-btn-primary {
+  background-color: #3E8310;
+  color: white;
+}
+
+.lead-form .lead-btn-primary:hover:not(:disabled) {
+  background-color: #15803d;
+}
+
+.lead-form .lead-btn-secondary {
+  background-color: #f3f4f6;
+  color: #374151;
+}
+
+.lead-form .lead-btn-secondary:hover:not(:disabled) {
+  background-color: #e5e7eb;
+}
+
+.lead-modal-success {
+  padding: 2rem 1.5rem;
+  text-align: center;
+}
+
+.lead-modal-success p {
+  margin: 0 0 0.5rem;
+  color: #374151;
+  font-size: 1rem;
+}
+
+.lead-modal-success .lead-btn-close {
+  margin-top: 1.5rem;
+  background-color: #3E8310;
+  color: white;
+  padding: 0.5rem 1.25rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  border: none;
+}
+
+.lead-modal-success .lead-btn-close:hover {
+  background-color: #15803d;
+}
+
+/* ===== MOBILE RESPONSIVE - Homepage & Projects Page ===== */
+@media (max-width: 768px) {
+  .container {
+    padding: 0 1rem;
+  }
+
+  .helpline-text {
+    font-size: 0.75rem;
+  }
+
+  .attention-banner-text {
+    font-size: 0.875rem;
+  }
+
+  .banner-slider-container {
+    height: 280px;
+  }
+
+  .banner-title {
+    font-size: 1.25rem !important;
+    line-height: 1.3;
+  }
+
+  .banner-subtitle {
+    font-size: 0.875rem !important;
+  }
+
+  .banner-nav-arrow {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .banner-nav-arrow-left {
+    left: 0.5rem;
+  }
+
+  .banner-nav-arrow-right {
+    right: 0.5rem;
+  }
+
+  .banner-nav-arrow svg {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .button-bar-content {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  .btn-live,
+  .btn-close {
+    padding: 0.4rem 1rem;
+    font-size: 0.875rem;
+  }
+
+  .content-section .container {
+    padding: 1rem;
+  }
+
+  .content-grid {
+    gap: 1.5rem;
+  }
+
+  .project-detail-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+
+  .button-group {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .registration-close-text {
+    font-size: 0.75rem;
+  }
+
+  .links-list {
+    gap: 0.5rem;
+  }
+
+  .action-link-text {
+    font-size: 0.8125rem;
+  }
+
+  .rera-stamp {
+    width: 6rem;
+    height: 6rem;
+  }
+
+  .rera-stamp-main {
+    font-size: 0.875rem;
+  }
+
+  .airport-section {
+    padding: 1.5rem 0;
+  }
+
+  .airport-layout {
+    gap: 1.5rem;
+  }
+
+  .sidebar-list li {
+    font-size: 0.875rem;
+  }
+
+  .airport-title {
+    font-size: 1.25rem;
+  }
+
+  .accordion-header {
+    padding: 0.875rem 1rem;
+    font-size: 0.875rem;
+  }
+
+  .accordion-title {
+    line-height: 1.4;
+  }
+
+  .accordion-content {
+    padding: 0.75rem;
+  }
+
+  .accordion-content .phases-table,
+  .accordion-content table {
+    font-size: 0.8125rem;
+  }
+
+  .accordion-content .phases-table th,
+  .accordion-content .phases-table td {
+    padding: 0.5rem;
+  }
+
+  /* Projects Page - Mobile */
+  .project-info-section {
+    padding: 1rem 0;
+  }
+
+  .project-info-card {
+    padding: 1rem;
+  }
+
+  .project-info-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .project-info-title {
+    font-size: 1.25rem;
+  }
+
+  .go-back-link {
+    font-size: 0.875rem;
+  }
+
+  .top_section_details .flex-row {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .top_section_details .flex-row div {
+    width: 100%;
+  }
+
+  .top_section_details .flex-full {
+    flex-direction: column;
+  }
+
+  .top_section_details .flex-full .label {
+    width: 100%;
+  }
+
+  .top_section_details .flex-full .value {
+    width: 100%;
+  }
+
+  .table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin: 0 -1rem;
+    padding: 0 1rem;
+  }
+
+  .payment-table {
+    font-size: 0.75rem;
+    min-width: 600px;
+  }
+
+  .payment-table th,
+  .payment-table td {
+    padding: 0.35rem 0.25rem;
+  }
+
+  .unit-cost-title {
+    font-size: 1rem;
+  }
+
+  .payment-table-title {
+    font-size: 0.875rem;
+  }
+
+  .lightbox-nav {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  .lightbox-close {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 0 0.75rem;
+  }
+
+  .banner-slider-container {
+    height: 220px;
+  }
+
+  .banner-title {
+    font-size: 1rem !important;
+  }
+
+  .banner-subtitle {
+    font-size: 0.8125rem !important;
+  }
+
+  .content-section .container {
+    padding: 0.75rem;
+  }
+
+  .project-info-card {
+    padding: 0.75rem;
+  }
+
+  .project-info-title {
+    font-size: 1.125rem;
+  }
+}

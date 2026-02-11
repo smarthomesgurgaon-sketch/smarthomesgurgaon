@@ -3,9 +3,11 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import LeadFormModal from './components/LeadFormModal';
 
 export default function Home() {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [leadModalOpen, setLeadModalOpen] = useState(false);
   
   const bannerImages = [
     '/banner/banner-1.webp',
@@ -196,7 +198,7 @@ export default function Home() {
                 {/* Apply Now Button */}
                 <div className="button-group">
                  <svg aria-hidden="true" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="M464 0H144c-26.5 0-48 21.5-48 48v48H48c-26.5 0-48 21.5-48 48v320c0 26.5 21.5 48 48 48h320c26.5 0 48-21.5 48-48v-48h48c26.5 0 48-21.5 48-48V48c0-26.5-21.5-48-48-48zm-96 464H48V256h320v208zm96-96h-48V144c0-26.5-21.5-48-48-48H144V48h320v320z"></path></svg>
-                  <button className="btn-apply">Apply Now</button>
+                  <button className="btn-apply" onClick={() => setLeadModalOpen(true)}>Apply Now</button>
                   <span className="registration-close-text">Registration Close</span>
                 </div>
 
@@ -581,6 +583,8 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      <LeadFormModal isOpen={leadModalOpen} onClose={() => setLeadModalOpen(false)} />
     </div>
   );
 }
