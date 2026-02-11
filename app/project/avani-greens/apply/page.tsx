@@ -176,47 +176,12 @@ export default function AvaniGreensApplyPage() {
         throw new Error(data.error || "Failed to submit");
       }
 
-      setStatus("success");
+      window.location.href = "https://payments.cashfree.com/forms/avani";
     } catch (err) {
       setStatus("error");
       setErrorMsg(err instanceof Error ? err.message : "Something went wrong");
     }
   };
-
-  if (status === "success") {
-    return (
-      <div className="page-wrapper">
-        <section className="project-info-section">
-          <div className="container">
-            <div className="project-info-card">
-              <div className="project-info-header">
-                <h1 className="project-info-title">
-                  Registration for Jan Awas Yojna Plotted Development, Rajasthan
-                </h1>
-                <Link href="/project/avani-greens" className="go-back-link">
-                  {"<< GO BACK"}
-                </Link>
-              </div>
-              <div className="apply-success-message">
-                <h2>
-                  Thank you! Your application has been submitted successfully.
-                </h2>
-                <p>
-                  We will contact you shortly on your provided contact details.
-                </p>
-                <Link
-                  href="/project/avani-greens"
-                  className="btn-apply-success"
-                >
-                  Back to Project
-                </Link>
-              </div>
-            </div>
-          </div>
-        </section>
-      </div>
-    );
-  }
 
   return (
     <div className="page-wrapper">
