@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import styles from './LeadFormModal.module.css';
+import { useState } from "react";
+import styles from "./LeadFormModal.module.css";
 
 interface LeadFormModalProps {
   isOpen: boolean;
@@ -10,41 +10,44 @@ interface LeadFormModalProps {
 
 export default function LeadFormModal({ isOpen, onClose }: LeadFormModalProps) {
   const [formData, setFormData] = useState({
-    fullName: '',
-    email: '',
-    whatsapp: '',
-    message: '',
+    fullName: "",
+    email: "",
+    whatsapp: "",
   });
-  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
-  const [errorMsg, setErrorMsg] = useState('');
+  const [status, setStatus] = useState<
+    "idle" | "loading" | "success" | "error"
+  >("idle");
+  const [errorMsg, setErrorMsg] = useState("");
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setStatus('loading');
-    setErrorMsg('');
+    setStatus("loading");
+    setErrorMsg("");
 
     try {
-      const res = await fetch('/api/send-lead', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch("/api/send-lead", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
 
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || 'Failed to submit');
+        throw new Error(data.error || "Failed to submit");
       }
 
-      setStatus('success');
-      setFormData({ fullName: '', email: '', whatsapp: '', message: '' });
+      setStatus("success");
+      setFormData({ fullName: "", email: "", whatsapp: "" });
     } catch (err) {
-      setStatus('error');
-      setErrorMsg(err instanceof Error ? err.message : 'Something went wrong');
+      setStatus("error");
+      setErrorMsg(err instanceof Error ? err.message : "Something went wrong");
     }
   };
 
@@ -54,7 +57,7 @@ export default function LeadFormModal({ isOpen, onClose }: LeadFormModalProps) {
     <div className={styles.overlay} onClick={onClose}>
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
         <div className={styles.header}>
-          <h2 className={styles.title}>Apply Now</h2>
+          <h2 className={styles.title}>First Step </h2>
           <button
             type="button"
             className={styles.closeBtn}
@@ -65,7 +68,7 @@ export default function LeadFormModal({ isOpen, onClose }: LeadFormModalProps) {
           </button>
         </div>
 
-        {status === 'success' ? (
+        {status === "success" ? (
           <div className={styles.success}>
             <p>Thank you! Your application has been submitted successfully.</p>
             <p>We will contact you shortly.</p>
@@ -85,7 +88,7 @@ export default function LeadFormModal({ isOpen, onClose }: LeadFormModalProps) {
                 value={formData.fullName}
                 onChange={handleChange}
                 placeholder="Enter your full name"
-                disabled={status === 'loading'}
+                disabled={status === "loading"}
               />
             </div>
             <div className={styles.formGroup}>
@@ -98,11 +101,11 @@ export default function LeadFormModal({ isOpen, onClose }: LeadFormModalProps) {
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="Enter your email"
-                disabled={status === 'loading'}
+                disabled={status === "loading"}
               />
             </div>
             <div className={styles.formGroup}>
-              <label htmlFor="whatsapp">WhatsApp Number *</label>
+              <label htmlFor="whatsapp">Number *</label>
               <input
                 id="whatsapp"
                 name="whatsapp"
@@ -111,23 +114,10 @@ export default function LeadFormModal({ isOpen, onClose }: LeadFormModalProps) {
                 value={formData.whatsapp}
                 onChange={handleChange}
                 placeholder="Enter your WhatsApp number"
-                disabled={status === 'loading'}
+                disabled={status === "loading"}
               />
             </div>
-            <div className={styles.formGroup}>
-              <label htmlFor="message">Message *</label>
-              <textarea
-                id="message"
-                name="message"
-                required
-                rows={4}
-                value={formData.message}
-                onChange={handleChange}
-                placeholder="Enter your message or query"
-                disabled={status === 'loading'}
-              />
-            </div>
-            {status === 'error' && (
+            {status === "error" && (
               <p className={styles.formError}>{errorMsg}</p>
             )}
             <div className={styles.formActions}>
@@ -135,16 +125,16 @@ export default function LeadFormModal({ isOpen, onClose }: LeadFormModalProps) {
                 type="button"
                 className={`${styles.btn} ${styles.btnSecondary}`}
                 onClick={onClose}
-                disabled={status === 'loading'}
+                disabled={status === "loading"}
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 className={`${styles.btn} ${styles.btnPrimary}`}
-                disabled={status === 'loading'}
+                disabled={status === "loading"}
               >
-                {status === 'loading' ? 'Sending...' : 'Submit'}
+                {status === "loading" ? "Sending..." : "Apply Now"}
               </button>
             </div>
           </form>

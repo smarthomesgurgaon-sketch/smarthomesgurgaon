@@ -160,7 +160,7 @@ export default function AvaniGreensPage() {
                         <td>58950</td>
                         <td>209850</td>
                         <td>419700</td>
-                        <td></td>
+                        <td>699500</td>
                       </tr>
                       <tr>
                         <td>6</td>
@@ -170,7 +170,7 @@ export default function AvaniGreensPage() {
                         <td>100920</td>
                         <td>335760</td>
                         <td>671520</td>
-                        <td></td>
+                        <td>1119200</td>
                       </tr>
                       <tr>
                         <td>5</td>
@@ -180,7 +180,7 @@ export default function AvaniGreensPage() {
                         <td>182062</td>
                         <td>579186</td>
                         <td>1158372</td>
-                        <td></td>
+                        <td>1925620</td>
                       </tr>
                       <tr>
                         <td>9</td>
@@ -190,7 +190,7 @@ export default function AvaniGreensPage() {
                         <td>212840</td>
                         <td>671520</td>
                         <td>1343040</td>
-                        <td></td>
+                        <td>2238400</td>
                       </tr>
                       <tr>
                         <td>2</td>
@@ -200,7 +200,7 @@ export default function AvaniGreensPage() {
                         <td>226830</td>
                         <td>713490</td>
                         <td>1426980</td>
-                        <td></td>
+                        <td>2378300</td>
                       </tr>
                       <tr>
                         <td>12</td>
@@ -210,7 +210,7 @@ export default function AvaniGreensPage() {
                         <td>268800</td>
                         <td>839400</td>
                         <td>1678800</td>
-                        <td></td>
+                        <td>2798000</td>
                       </tr>
                       <tr>
                         <td>3</td>
@@ -220,7 +220,7 @@ export default function AvaniGreensPage() {
                         <td>296780</td>
                         <td>923340</td>
                         <td>1846680</td>
-                        <td></td>
+                        <td>3087800</td>
                       </tr>
                       <tr>
                         <td>5</td>

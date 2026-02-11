@@ -298,7 +298,7 @@ body {
 .banner-slider-container {
   position: relative;
   width: 100%;
-  height: 500px;
+  height: 330px;
   overflow: hidden;
 }
 
@@ -1094,6 +1094,18 @@ body {
   padding: 1rem;
   border-top: 1px solid var(--gray-200);
   background: var(--white);
+  color: #000;
+}
+
+.accordion-content p,
+.accordion-content td,
+.accordion-content th,
+.accordion-content strong,
+.accordion-content li,
+.accordion-content .phases-table td,
+.accordion-content .phases-table th,
+.accordion-content .project-cost-text {
+  color: #000;
 }
 
 .project-cost-text {
@@ -1405,6 +1417,10 @@ body {
   border: 1px solid #eee;
   background: inherit;
   word-wrap: break-word;
+}
+
+.payment-table td:last-child {
+  font-weight: 600;
 }
 
 @media (max-width: 1024px) {
@@ -2181,7 +2197,7 @@ a.contact-value:hover {
   }
 
   .banner-slider-container {
-    height: 280px;
+    height: 110px;
   }
 
   .banner-title {
@@ -2387,7 +2403,7 @@ a.contact-value:hover {
   }
 
   .banner-slider-container {
-    height: 220px;
+    height: 190px;
   }
 
   .banner-title {

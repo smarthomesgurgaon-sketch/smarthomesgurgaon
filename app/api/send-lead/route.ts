@@ -9,9 +9,9 @@ const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || "onboarding@resend.dev";
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { fullName, email, whatsapp, message } = body;
+    const { fullName, email, whatsapp } = body;
 
-    if (!fullName || !email || !whatsapp || !message) {
+    if (!fullName || !email || !whatsapp) {
       return NextResponse.json(
         { error: "All fields are required" },
         { status: 400 }
@@ -34,8 +34,6 @@ export async function POST(request: Request) {
         <p><strong>Full Name:</strong> ${fullName}</p>
         <p><strong>Email:</strong> ${email}</p>
         <p><strong>WhatsApp:</strong> ${whatsapp}</p>
-        <p><strong>Message:</strong></p>
-        <p>${message}</p>
         <hr>
         <p><em>Sent from Jan Awas Yojna Plots website</em></p>
       `,
