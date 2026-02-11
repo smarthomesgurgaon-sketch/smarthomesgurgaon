@@ -2985,10 +2985,14 @@ a.contact-value:hover {
 
   .content-grid {
     gap: 1.5rem;
+    border: 1px solid #dfdfdf;
+    box-shadow: 0 8px 24px #959da533;
+    padding: 20px !important;
   }
 
   .project-detail-item {
     flex-direction: column;
+
     align-items: flex-start;
     gap: 0.25rem;
   }
@@ -3003,7 +3007,7 @@ a.contact-value:hover {
   }
 
   .links-list {
-    gap: 0.5rem;
+    gap: 16px;
   }
 
   .action-link-text {
@@ -3025,6 +3029,40 @@ a.contact-value:hover {
 
   .airport-layout {
     gap: 1.5rem;
+    padding-inline: 20px;
+  }
+
+  .project-detail-item {
+    flex-direction: unset;
+    font-size: 14px;
+  }
+
+  .project-label {
+    margin-right: 0;
+  }
+
+  .content-section .container {
+    padding: 20px !important;
+    box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+    border: 1px solid #DFDFDF;
+    max-width: calc(100vw - 40px);
+    border-radius: 0;
+  }
+
+  .banner-dots {
+    display: none !important;
+  }
+
+  .date-time {
+    display: none;
+  }
+
+  .top-bar-content {
+    align-items: center;
+  }
+
+  .helpline-text {
+    justify-content: center;
   }
 
   .sidebar-list li {
@@ -3144,9 +3182,11 @@ a.contact-value:hover {
 
   .banner-slider-container {
     height: 110px;
-    padding-inline: 8px;
   }
 
+  .main-header {
+    padding-block: 4px;
+  }
 
   .banner-title {
     font-size: 12px !important;
