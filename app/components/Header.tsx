@@ -9,6 +9,7 @@ const HELPLINE_TEL = '+917840020072';
 
 export default function Header() {
   const [currentDateTime, setCurrentDateTime] = useState('');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const updateDateTime = () => {
@@ -65,7 +66,26 @@ export default function Header() {
             <div className="nav-links">
               <Link href="/" className="nav-link">Home</Link>
               <Link href="/news-room" className="nav-link">News Room</Link>
-              <a href="#" className="nav-link">How To Apply</a>
+              <Link href="/project/avani-greens/apply" className="nav-link">How To Apply</Link>
+            </div>
+            <div className="nav-mobile-wrap">
+              <button
+                type="button"
+                className="nav-hamburger"
+                onClick={() => setMobileMenuOpen((o) => !o)}
+                aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <line x1="3" y1="6" x2="21" y2="6" />
+                  <line x1="3" y1="12" x2="21" y2="12" />
+                  <line x1="3" y1="18" x2="21" y2="18" />
+                </svg>
+              </button>
+              <div className={`nav-dropdown ${mobileMenuOpen ? "nav-dropdown-open" : ""}`}>
+                <Link href="/" className="nav-dropdown-link" onClick={() => setMobileMenuOpen(false)}>Home</Link>
+                <Link href="/news-room" className="nav-dropdown-link" onClick={() => setMobileMenuOpen(false)}>News Room</Link>
+                <Link href="/project/avani-greens/apply" className="nav-dropdown-link" onClick={() => setMobileMenuOpen(false)}>How To Apply</Link>
+              </div>
             </div>
           </div>
         </div>

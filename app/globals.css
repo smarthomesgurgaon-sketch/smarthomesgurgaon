@@ -168,6 +168,21 @@ body {
   }
 }
 
+/* Hamburger - hidden on desktop */
+.nav-hamburger {
+  display: none;
+  background: none;
+  border: none;
+  padding: 0.5rem;
+  cursor: pointer;
+  color: var(--gray-700);
+}
+
+.nav-hamburger svg {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
 /* Navigation Links */
 .nav-links {
   display: flex;
@@ -185,6 +200,80 @@ body {
 
 .nav-link:hover {
   color: var(--blue-primary);
+}
+
+/* Mobile nav - hidden on desktop */
+.nav-mobile-wrap {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .main-header-content {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .nav-links {
+    display: none;
+  }
+
+  .nav-mobile-wrap {
+    display: block;
+    position: relative;
+    margin-left: auto;
+  }
+
+  .nav-hamburger {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    padding: 0.5rem;
+    cursor: pointer;
+    color: var(--gray-700);
+  }
+
+  .nav-hamburger svg {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  .nav-dropdown {
+    position: fixed;
+    top: 150px;
+    left: 0;
+    right: 0;
+    width: 100%;
+    background: #fff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    z-index: 1000;
+    display: none;
+  }
+
+  .nav-dropdown.nav-dropdown-open {
+    display: block;
+  }
+
+  .nav-dropdown-link {
+    display: block;
+    padding: 0.75rem 1rem;
+    font-size: 0.9375rem;
+    color: #333;
+    text-decoration: none;
+    border-bottom: 1px solid #f3f4f6;
+  }
+
+  .nav-dropdown-link:last-child {
+    border-bottom: none;
+  }
+
+  .nav-dropdown-link:hover {
+    background: #f9fafb;
+    color: var(--blue-primary);
+  }
 }
 
 /* Slogan Section */
@@ -2918,7 +3007,7 @@ a.contact-value:hover {
   }
 
   .action-link-text {
-    font-size: 0.8125rem;
+    font-size: 16px;
   }
 
   .rera-stamp {
@@ -3054,15 +3143,17 @@ a.contact-value:hover {
   }
 
   .banner-slider-container {
-    height: 190px;
+    height: 110px;
+    padding-inline: 8px;
   }
 
+
   .banner-title {
-    font-size: 1rem !important;
+    font-size: 12px !important;
   }
 
   .banner-subtitle {
-    font-size: 0.8125rem !important;
+    font-size: 11px !important;
   }
 
   .content-section .container {
@@ -3075,5 +3166,29 @@ a.contact-value:hover {
 
   .project-info-title {
     font-size: 1.125rem;
+  }
+
+  .actions-card {
+    padding-left: 0;
+    border-left: none;
+    border-top: 1px solid var(--gray-200);
+    padding-top: 1rem;
+  }
+
+  .button-bar-content button {
+    width: 100%;
+    text-align: left;
+    display: flex;
+    justify-content: start;
+    padding: 16px 20px;
+  }
+
+  .logo-container {
+    width: 60px;
+    height: 60px;
+  }
+
+  .button-bar-content button:last-child {
+    display: none;
   }
 }
