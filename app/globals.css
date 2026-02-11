@@ -264,14 +264,15 @@ body {
   white-space: nowrap;
   display: inline-block;
   animation: scroll-banner 50s linear infinite;
+  animation-delay: 0s;
+  animation-fill-mode: none;
   padding: 0 2rem;
 }
 
 @keyframes scroll-banner {
   0% {
-    transform: translateX(100%);
+    transform: translateX(0);
   }
-
   100% {
     transform: translateX(-100%);
   }
