@@ -14,9 +14,27 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const BASE_URL = "https://janawasplot.com";
+
 export const metadata: Metadata = {
-  title: "Jan Awas Yojna Plotted Development",
-  description: "Applications invited for the allotment of ready-for-possession residential plots under Jan Awas Yojna, Rajasthan",
+  metadataBase: new URL(BASE_URL),
+  title: {
+    default: "Jan Awas Yojna Plotted Development – RERA Approved Residential Plots in Rajasthan",
+    template: "%s | Jan Awas Yojna Plots",
+  },
+  description:
+    "RERA-approved residential plot under Jan Awas Yojna in Rajasthan. Affordable, ready-for-possession plots with government-backed planning, legal security, and excellent connectivity. Apply now to secure your dream home in a growing community.",
+  openGraph: {
+    title: "Jan Awas Yojna Plotted Development – RERA Approved Residential Plots in Rajasthan",
+    description:
+      "RERA-approved residential plot under Jan Awas Yojna in Rajasthan. Affordable, ready-for-possession plots with government-backed planning, legal security, and excellent connectivity. Apply now to secure your dream home in a growing community.",
+    url: BASE_URL,
+    siteName: "Jan Awas Yojna Plots",
+    type: "website",
+  },
+  alternates: {
+    canonical: BASE_URL,
+  },
 };
 
 export default function RootLayout({

@@ -11,7 +11,7 @@ export default function RefundPolicyPage() {
             
             <div className="about-content">
               <p className="about-paragraph">
-                At JanawasYojnaPlots.com, we are committed to ensuring a transparent and fair refund process for our customers. Please review our refund policy outlined below:
+                At JanawasPlot.com, we are committed to ensuring a transparent and fair refund process for our customers. Please review our refund policy outlined below:
               </p>
 
               <h2 className="about-subtitle">Refund Timeline</h2>

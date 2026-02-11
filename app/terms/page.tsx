@@ -11,7 +11,7 @@ export default function TermsConditionsPage() {
             
             <div className="about-content">
               <p className="about-paragraph">
-                <strong>Terms and Conditions for www.janawasyojnaplots.com</strong>
+                <strong>Terms and Conditions for www.janawasplot.com</strong>
               </p>
               <p className="about-paragraph">
                 <strong>Effective Date: 01.04.2025</strong>
@@ -19,7 +19,7 @@ export default function TermsConditionsPage() {
 
               <h2 className="about-subtitle">1. Introduction</h2>
               <p className="about-paragraph">
-                Welcome to www.janawasyojnaplots.com ("Company"). By accessing or using this website, you agree to comply with and be bound by these Terms and Conditions. If you do not agree with any part of these terms, please do not use our website.
+                Welcome to www.janawasplot.com ("Company"). By accessing or using this website, you agree to comply with and be bound by these Terms and Conditions. If you do not agree with any part of these terms, please do not use our website.
               </p>
 
               <h2 className="about-subtitle">2. Use of the Website</h2>
@@ -58,7 +58,7 @@ export default function TermsConditionsPage() {
               <ul className="about-features-list">
                 <li>
                   <span className="feature-checkmark">✔</span>
-                  <span className="feature-text">All content, trademarks, logos, images, and materials on this website are the property of www.janawasyojnaplots.com and/or its affiliates.</span>
+                  <span className="feature-text">All content, trademarks, logos, images, and materials on this website are the property of www.janawasplot.com and/or its affiliates.</span>
                 </li>
                 <li>
                   <span className="feature-checkmark">✔</span>
@@ -153,12 +153,12 @@ export default function TermsConditionsPage() {
                 </li>
                 <li>
                   <span className="feature-checkmark">🌐</span>
-                  <span className="feature-text"><strong>Website:</strong> www.janawasyojnaplots.com</span>
+                  <span className="feature-text"><strong>Website:</strong> www.janawasplot.com</span>
                 </li>
               </ul>
 
               <p className="about-paragraph">
-                By using www.janawasyojnaplots.com, you agree to abide by these Terms and Conditions.
+                By using www.janawasplot.com, you agree to abide by these Terms and Conditions.
               </p>
 
               <p className="about-paragraph" style={{ color: 'var(--red-600)', marginTop: '1.5rem', fontWeight: '500' }}>

@@ -11,19 +11,19 @@ export default function PrivacyPolicyPage() {
             
             <div className="about-content">
               <p className="about-paragraph">
-                <strong>Privacy Policy for www.janawasyojnaplots.com</strong>
+                <strong>Privacy Policy for www.janawasplot.com</strong>
               </p>
               <p className="about-paragraph">
                 <strong>Effective Date: 01.04.2025</strong>
               </p>
 
               <p className="about-paragraph">
-                Welcome to www.janawasyojnaplots.com. Thank you for visiting www.janawasyojnaplots.com. Your privacy is important to us. This Privacy Policy outlines how we collect, use, disclose, and protect your personal information when you visit our website.
+                Welcome to www.janawasplot.com. Thank you for visiting www.janawasplot.com. Your privacy is important to us. This Privacy Policy outlines how we collect, use, disclose, and protect your personal information when you visit our website.
               </p>
 
               <h2 className="about-subtitle">1. Official Website Disclaimer</h2>
               <p className="about-paragraph">
-                This is the only official website of www.janawasyojnaplots.com (&quot;Company&quot;). We caution users/customers not to rely on any other websites that may appear similar or claim to represent us, including those using our logo, brand name, or other details.
+                This is the only official website of www.janawasplot.com (&quot;Company&quot;). We caution users/customers not to rely on any other websites that may appear similar or claim to represent us, including those using our logo, brand name, or other details.
               </p>
               <p className="about-paragraph">
                 If you come across any such misleading websites, please report them to us at <a href="mailto:Kishanpandey844@gmail.com" className="helpline-link">Kishanpandey844@gmail.com</a> so we can take appropriate action.
@@ -142,7 +142,7 @@ export default function PrivacyPolicyPage() {
 
               <h2 className="about-subtitle">10. Intellectual Property Rights</h2>
               <p className="about-paragraph">
-                All trademarks, copyrights, database rights, and other intellectual property on this website are the sole property of www.janawasyojnaplots.com and/or its affiliates. Unauthorized use, copying, or reproduction of any content is strictly prohibited.
+                All trademarks, copyrights, database rights, and other intellectual property on this website are the sole property of www.janawasplot.com and/or its affiliates. Unauthorized use, copying, or reproduction of any content is strictly prohibited.
               </p>
 
               <h2 className="about-subtitle">11. Limitation of Liability</h2>
@@ -170,12 +170,12 @@ export default function PrivacyPolicyPage() {
                 </li>
                 <li>
                   <span className="feature-checkmark">🌐</span>
-                  <span className="feature-text"><strong>Website:</strong> www.janawasyojnaplots.com</span>
+                  <span className="feature-text"><strong>Website:</strong> www.janawasplot.com</span>
                 </li>
               </ul>
 
               <p className="about-paragraph">
-                By using janawasyojnaplots.com, you consent to this Privacy Policy.
+                By using janawasplot.com, you consent to this Privacy Policy.
               </p>
             </div>
           </div>
