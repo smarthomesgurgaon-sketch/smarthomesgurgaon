@@ -64,7 +64,12 @@ export default function AvaniGreensPage() {
             {/* Title and Go Back */}
             <div className="project-info-header">
               <h1 className="project-info-title">PROJECT SCHEME INFORMATION</h1>
-              <Link href="/" className="go-back-link">{"<< GO BACK"}</Link>
+              <div className="project-info-header-actions">
+                <Link href="/project/avani-greens/apply" className="btn-apply">
+                  Apply Now
+                </Link>
+                <Link href="/" className="go-back-link">{"<< GO BACK"}</Link>
+              </div>
             </div>
 
             <div className='top_section_details'>
