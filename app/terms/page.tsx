@@ -233,20 +233,6 @@ export default function TermsConditionsPage() {
                 By using www.janawasplot.com, you agree to abide by these Terms
                 and Conditions.
               </p>
-
-              <p
-                className="about-paragraph"
-                style={{
-                  color: "var(--red-600)",
-                  marginTop: "1.5rem",
-                  fontWeight: "500",
-                }}
-              >
-                <strong>
-                  Legal Name: This website is operated by Lifestyle Supertech
-                  Pvt Ltd.
-                </strong>
-              </p>
             </div>
           </div>
         </div>
