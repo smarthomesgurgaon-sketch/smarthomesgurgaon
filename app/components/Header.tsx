@@ -4,8 +4,8 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 
-const HELPLINE_PHONE = '7840020072';
-const HELPLINE_TEL = '+917840020072';
+const HELPLINE_PHONE = '7840020074';
+const HELPLINE_TEL = '+917840020074';
 
 export default function Header() {
   const [currentDateTime, setCurrentDateTime] = useState('');

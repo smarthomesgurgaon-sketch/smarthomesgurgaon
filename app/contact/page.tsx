@@ -32,7 +32,7 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <span className="contact-label">Phone:</span>
-                  <a href="tel:+917840020072" className="contact-value">7840020072</a>
+                  <a href="tel:+917840020074" className="contact-value">7840020074</a>
                 </div>
               </div>
 
