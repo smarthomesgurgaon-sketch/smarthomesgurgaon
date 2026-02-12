@@ -108,6 +108,15 @@ export default function AvaniGreensApplyPage() {
 
   const handleStep2Next = (e: React.FormEvent) => {
     e.preventDefault();
+    const requiredDocs = ["aadhaarCard", "panCard", "photo", "cancelledCheque"];
+    const missing = requiredDocs.filter((d) => !docFiles[d]);
+    if (missing.length > 0) {
+      setErrorMsg(
+        "Please upload all required documents: Aadhaar Card, Pan Card, Photo, and Cancelled Cheque.",
+      );
+      return;
+    }
+    setErrorMsg("");
     setStep(3);
   };
 
@@ -573,7 +582,6 @@ export default function AvaniGreensApplyPage() {
                             type="file"
                             id="aadhaarCard"
                             accept=".pdf,.jpg,.jpeg,.png"
-                            required
                             onChange={(e) =>
                               handleDocFileChange("aadhaarCard", e)
                             }
@@ -635,7 +643,6 @@ export default function AvaniGreensApplyPage() {
                             type="file"
                             id="panCard"
                             accept=".pdf,.jpg,.jpeg,.png"
-                            required
                             onChange={(e) => handleDocFileChange("panCard", e)}
                             className="apply-doc-file-input"
                           />
@@ -695,7 +702,6 @@ export default function AvaniGreensApplyPage() {
                             type="file"
                             id="photo"
                             accept=".jpg,.jpeg,.png"
-                            required
                             onChange={(e) => handleDocFileChange("photo", e)}
                             className="apply-doc-file-input"
                           />
@@ -756,7 +762,6 @@ export default function AvaniGreensApplyPage() {
                             type="file"
                             id="cancelledCheque"
                             accept=".pdf,.jpg,.jpeg,.png"
-                            required
                             onChange={(e) =>
                               handleDocFileChange("cancelledCheque", e)
                             }
@@ -938,11 +943,17 @@ export default function AvaniGreensApplyPage() {
                     </div>
                   )}
 
+                  {errorMsg && (
+                    <p className="apply-form-error">{errorMsg}</p>
+                  )}
                   <div className="apply-form-actions apply-form-actions-two">
                     <button
                       type="button"
                       className="btn-apply-prev"
-                      onClick={() => setStep(1)}
+                      onClick={() => {
+                        setErrorMsg("");
+                        setStep(1);
+                      }}
                     >
                       Previous
                     </button>
@@ -1221,7 +1232,10 @@ export default function AvaniGreensApplyPage() {
                     <button
                       type="button"
                       className="btn-apply-prev"
-                      onClick={() => setStep(2)}
+                      onClick={() => {
+                        setErrorMsg("");
+                        setStep(2);
+                      }}
                       disabled={status === "loading"}
                     >
                       Previous
