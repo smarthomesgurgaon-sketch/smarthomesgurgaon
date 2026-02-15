@@ -68,9 +68,11 @@ export default function AvaniGreensApplyPage() {
     const handleInvalid = (e: Event) => {
       e.preventDefault();
       e.stopPropagation();
+      e.stopImmediatePropagation();
       const target = e.target;
       if (target instanceof HTMLInputElement || target instanceof HTMLSelectElement || target instanceof HTMLTextAreaElement) {
-        target.setCustomValidity("");
+        target.setCustomValidity(" ");
+        requestAnimationFrame(() => target.setCustomValidity(""));
       }
       const currentStep = stepRef.current;
       const msg = currentStep === 1
@@ -499,6 +501,7 @@ export default function AvaniGreensApplyPage() {
                 </div>
               </div>
 
+              <div key={step}>
               {step === 1 && (
                 <div className="apply-form">
                   <h3 className="apply-section-title">
@@ -1444,6 +1447,11 @@ export default function AvaniGreensApplyPage() {
                           value={size}
                           checked={step2Data.plotSize === size}
                           onChange={handleStep2Change}
+                          onInvalid={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            (e.target as HTMLInputElement).setCustomValidity("");
+                          }}
                         />
                         {size} Sq. Yd
                       </label>
@@ -1476,6 +1484,11 @@ export default function AvaniGreensApplyPage() {
                         name="termsAccepted"
                         checked={step2Data.termsAccepted}
                         onChange={handleStep2Change}
+                        onInvalid={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          (e.target as HTMLInputElement).setCustomValidity("");
+                        }}
                       />
                       <span>
                         I have read and agree to the{" "}
@@ -1517,6 +1530,7 @@ export default function AvaniGreensApplyPage() {
                   </div>
                 </div>
               )}
+              </div>
             </div>
           </div>
         </div>
