@@ -99,8 +99,8 @@ export default function AvaniGreensApplyPage() {
     setStep2Data((prev) => ({ ...prev, [target.name]: value }));
   };
 
-  const handleStep1Next = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleStep1Next = (e?: React.FormEvent) => {
+    e?.preventDefault?.();
     const name = (step1Data.fullName || "").trim();
     const email = (step1Data.email || "").trim();
     const whatsapp = (step1Data.whatsapp || "").replace(/\D/g, "");
@@ -124,8 +124,8 @@ export default function AvaniGreensApplyPage() {
     setStep(2);
   };
 
-  const handleStep2Next = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleStep2Next = (e?: React.FormEvent) => {
+    e?.preventDefault?.();
     const trim = (s: string) => (s || "").toString().trim();
     const digits = (s: string) => (s || "").toString().replace(/\D/g, "");
     if (!trim(step2Data.applicantName)) {
@@ -262,8 +262,8 @@ export default function AvaniGreensApplyPage() {
       reader.onerror = reject;
     });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (e?: React.FormEvent) => {
+    e?.preventDefault?.();
     if (!step2Data.plotSize) {
       setErrorMsg("Please select a plot size.");
       return;
@@ -391,7 +391,7 @@ export default function AvaniGreensApplyPage() {
               </div>
 
               {step === 1 && (
-                <form onSubmit={handleStep1Next} className="apply-form" noValidate>
+                <div className="apply-form">
                   <h3 className="apply-section-title">
                     Step 1: Contact Details
                   </h3>
@@ -443,15 +443,19 @@ export default function AvaniGreensApplyPage() {
                   </div>
 
                   <div className="apply-form-actions">
-                    <button type="submit" className="btn-apply-next">
+                    <button
+                      type="button"
+                      className="btn-apply-next"
+                      onClick={handleStep1Next}
+                    >
                       Next →
                     </button>
                   </div>
-                </form>
+                </div>
               )}
 
               {step === 2 && (
-                <form onSubmit={handleStep2Next} className="apply-form" noValidate>
+                <div className="apply-form">
                   {/* Category */}
                   <div className="apply-form-block">
                     <h4 className="apply-block-title">Category</h4>
@@ -1111,21 +1115,18 @@ export default function AvaniGreensApplyPage() {
                       Previous
                     </button>
                     <button
-                      type="submit"
+                      type="button"
                       className="btn-apply-next"
+                      onClick={handleStep2Next}
                     >
                       Next →
                     </button>
                   </div>
-                </form>
+                </div>
               )}
 
               {step === 3 && (
-                <form
-                  onSubmit={handleSubmit}
-                  className="apply-form apply-step-three"
-                  noValidate
-                >
+                <div className="apply-form apply-step-three">
                   <h3 className="apply-step3-title">
                     {step2Data.category === "general"
                       ? "PRICE FOR GENERAL APPLICANTS"
@@ -1393,14 +1394,15 @@ export default function AvaniGreensApplyPage() {
                       Previous
                     </button>
                     <button
-                      type="submit"
+                      type="button"
                       className="btn-apply-submit"
                       disabled={status === "loading"}
+                      onClick={() => handleSubmit()}
                     >
                       {status === "loading" ? "Submitting..." : "Submit & Pay"}
                     </button>
                   </div>
-                </form>
+                </div>
               )}
             </div>
           </div>
