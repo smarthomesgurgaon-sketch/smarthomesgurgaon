@@ -39,7 +39,15 @@ function sanitizeFilename(name: string): string {
     .replace(/_+/g, "_")
     .replace(/^_+|_+$/g, "");
   // avoid empty filename
-  return cleaned || "attachment";
+  const limited = (cleaned || "attachment").slice(0, 120);
+  return limited || "attachment";
+}
+
+function looksLikeBase64(content: string): boolean {
+  const c = (content || "").toString().replace(/\s+/g, "");
+  if (!c) return false;
+  // tolerate base64 padding
+  return /^[A-Za-z0-9+/]+={0,2}$/.test(c);
 }
 
 export async function POST(request: Request) {
@@ -163,7 +171,8 @@ export async function POST(request: Request) {
               typeof a.filename === "string" &&
               typeof a.content === "string" &&
               a.filename.trim() &&
-              a.content.trim(),
+              a.content.trim() &&
+              looksLikeBase64(a.content),
           )
           .map((a: any) => ({
             filename: sanitizeFilename(a.filename),
@@ -201,12 +210,32 @@ export async function POST(request: Request) {
     if (error) {
       console.error("Resend error:", error);
       const msg = (error.message || "").toString();
-      // Resend often returns this for invalid "from" format.
-      if (msg.toLowerCase().includes("expected pattern")) {
+      const lower = msg.toLowerCase();
+
+      // Mobile-only issues often come from attachment filenames/content.
+      if (safeAttachments.length > 0) {
+        // Retry once WITHOUT attachments (so user can proceed to payment).
+        const retryPayload = { ...emailPayload };
+        delete retryPayload.attachments;
+        retryPayload.html +=
+          "<hr><p><strong>Note:</strong> Documents could not be attached from the device/browser. Please request docs again if needed.</p>";
+
+        const retry = await resend.emails.send(retryPayload);
+        if (!retry.error) {
+          return NextResponse.json({
+            success: true,
+            id: retry.data?.id,
+            warning: "Email sent without attachments (mobile attachment issue).",
+          });
+        }
+      }
+
+      // Resend often returns these for schema-format issues.
+      if (lower.includes("expected pattern") || lower.includes("did not match the expected pattern")) {
         return NextResponse.json(
           {
             error:
-              "Email service configuration error (invalid sender email). Please contact support.",
+              "Email service rejected the request (format issue). Please try again or contact support.",
           },
           { status: 500 },
         );

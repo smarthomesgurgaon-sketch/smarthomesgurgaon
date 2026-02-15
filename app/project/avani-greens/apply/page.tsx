@@ -99,16 +99,41 @@ export default function AvaniGreensApplyPage() {
     setStep2Data((prev) => ({ ...prev, [target.name]: value }));
   };
 
-  const fileToBase64 = (file: File): Promise<string> =>
+  const fileToBase64 = (file: File, timeoutMs = 30000): Promise<string> =>
     new Promise((resolve, reject) => {
       const reader = new FileReader();
-      reader.readAsDataURL(file);
+      const timer = window.setTimeout(() => {
+        try {
+          reader.abort();
+        } catch {
+          // ignore
+        }
+        reject(new Error("File reading timed out. Please try again."));
+      }, timeoutMs);
+
+      const cleanup = () => window.clearTimeout(timer);
+
       reader.onload = () => {
+        cleanup();
         const result = reader.result as string;
         // Some devices can include whitespace/newlines in long base64 strings.
         resolve(((result.split(",")[1] || "") + "").replace(/\s+/g, ""));
       };
-      reader.onerror = reject;
+      reader.onerror = () => {
+        cleanup();
+        reject(new Error("Failed to read file. Please try again."));
+      };
+      reader.onabort = () => {
+        cleanup();
+        reject(new Error("File reading was aborted. Please try again."));
+      };
+
+      try {
+        reader.readAsDataURL(file);
+      } catch {
+        cleanup();
+        reject(new Error("Failed to read file. Please try again."));
+      }
     });
 
   const handleSubmit = async (e?: React.FormEvent) => {
@@ -177,13 +202,17 @@ export default function AvaniGreensApplyPage() {
           : step2Data.coApplicantPhone,
         attachments,
       };
+      const controller = new AbortController();
+      const fetchTimer = window.setTimeout(() => controller.abort(), 45000);
       const res = await fetch("/api/send-lead", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
+        signal: controller.signal,
       });
+      window.clearTimeout(fetchTimer);
 
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
 
       if (!res.ok) {
         throw new Error(data.error || "Failed to submit");
@@ -192,6 +221,10 @@ export default function AvaniGreensApplyPage() {
       window.location.href = "https://payments.cashfree.com/forms/avani";
     } catch (err) {
       setStatus("error");
+      if (err && typeof err === "object" && "name" in err && (err as any).name === "AbortError") {
+        setErrorMsg("Request timed out on mobile network. Please try again.");
+        return;
+      }
       setErrorMsg(err instanceof Error ? err.message : "Something went wrong");
     }
   };
