@@ -27,6 +27,25 @@ export default function LeadFormModal({ isOpen, onClose }: LeadFormModalProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const name = (formData.fullName || "").trim();
+    const email = (formData.email || "").trim();
+    const whatsapp = (formData.whatsapp || "").replace(/\D/g, "");
+    if (!name) {
+      setErrorMsg("Please enter your full name.");
+      return;
+    }
+    if (!email) {
+      setErrorMsg("Please enter your email.");
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setErrorMsg("Please enter a valid email address.");
+      return;
+    }
+    if (!whatsapp || whatsapp.length < 10) {
+      setErrorMsg("Please enter a valid number (at least 10 digits).");
+      return;
+    }
     setStatus("loading");
     setErrorMsg("");
 
@@ -77,14 +96,13 @@ export default function LeadFormModal({ isOpen, onClose }: LeadFormModalProps) {
             </button>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className={styles.form}>
+          <form onSubmit={handleSubmit} className={styles.form} noValidate>
             <div className={styles.formGroup}>
               <label htmlFor="fullName">Full Name *</label>
               <input
                 id="fullName"
                 name="fullName"
                 type="text"
-                required
                 value={formData.fullName}
                 onChange={handleChange}
                 placeholder="Enter your full name"
@@ -96,8 +114,8 @@ export default function LeadFormModal({ isOpen, onClose }: LeadFormModalProps) {
               <input
                 id="email"
                 name="email"
-                type="email"
-                required
+                type="text"
+                inputMode="email"
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="Enter your email"
@@ -109,8 +127,8 @@ export default function LeadFormModal({ isOpen, onClose }: LeadFormModalProps) {
               <input
                 id="whatsapp"
                 name="whatsapp"
-                type="tel"
-                required
+                type="text"
+                inputMode="tel"
                 value={formData.whatsapp}
                 onChange={handleChange}
                 placeholder="Enter your WhatsApp number"

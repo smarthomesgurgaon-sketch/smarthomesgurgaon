@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 
 const PLOT_SIZES = ["50", "80", "138", "160", "170", "200", "220", "270"];
 
 export default function AvaniGreensApplyPage() {
+  const formRef = useRef<HTMLDivElement>(null);
   const [step, setStep] = useState(1);
   const [status, setStatus] = useState<
     "idle" | "loading" | "success" | "error"
@@ -57,6 +58,42 @@ export default function AvaniGreensApplyPage() {
   const [docFiles, setDocFiles] = useState<
     Record<string, { file: File; size: string }>
   >({});
+
+  useEffect(() => {
+    const handleInvalid = (e: Event) => {
+      e.preventDefault();
+      e.stopPropagation();
+    };
+    document.addEventListener("invalid", handleInvalid, true);
+    return () => document.removeEventListener("invalid", handleInvalid, true);
+  }, []);
+
+  useEffect(() => {
+    const container = formRef.current;
+    if (!container) return;
+    const inputs = container.querySelectorAll("input, select, textarea");
+    const clearValidity = (el: EventTarget | Element) => {
+      if (el instanceof HTMLInputElement || el instanceof HTMLSelectElement || el instanceof HTMLTextAreaElement) {
+        el.setCustomValidity("");
+      }
+    };
+    const handlers: Array<{ el: Element; h: () => void }> = [];
+    inputs.forEach((el) => {
+      clearValidity(el);
+      const h = () => clearValidity(el);
+      el.addEventListener("input", h);
+      el.addEventListener("change", h);
+      el.addEventListener("blur", h);
+      handlers.push({ el, h });
+    });
+    return () => {
+      handlers.forEach(({ el, h }) => {
+        el.removeEventListener("input", h);
+        el.removeEventListener("change", h);
+        el.removeEventListener("blur", h);
+      });
+    };
+  }, [step]);
 
   const handleDocFileChange = (
     field: string,
@@ -136,8 +173,13 @@ export default function AvaniGreensApplyPage() {
       setErrorMsg("Please enter Son/Wife/Daughter/Of.");
       return;
     }
-    if (!trim(step2Data.dateOfBirth)) {
-      setErrorMsg("Please enter Date of Birth.");
+    const dob = trim(step2Data.dateOfBirth);
+    if (!dob) {
+      setErrorMsg("Please enter Date of Birth (YYYY-MM-DD).");
+      return;
+    }
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(dob)) {
+      setErrorMsg("Please enter Date of Birth in YYYY-MM-DD format.");
       return;
     }
     if (!trim(step2Data.gender)) {
@@ -371,7 +413,7 @@ export default function AvaniGreensApplyPage() {
               </Link>
             </div>
 
-            <div className="apply-form-steps">
+            <div className="apply-form-steps" ref={formRef}>
               <div className="apply-progress-wrap">
                 <span className="apply-progress-label">
                   Step {step} of 3 -
@@ -545,9 +587,11 @@ export default function AvaniGreensApplyPage() {
                         <label>Date of Birth *</label>
                         <input
                           name="dateOfBirth"
-                          type="date"
+                          type="text"
+                          inputMode="numeric"
                           value={step2Data.dateOfBirth}
                           onChange={handleStep2Change}
+                          placeholder="YYYY-MM-DD"
                         />
                       </div>
                       <div className="apply-form-group">
