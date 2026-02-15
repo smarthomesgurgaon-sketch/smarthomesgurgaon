@@ -1,12 +1,8 @@
 import { NextResponse } from "next/server";
-import { Resend } from "resend";
-
-const resend = new Resend(process.env.RESEND_API_KEY);
+import nodemailer from "nodemailer";
 
 // Domain janawasplot.com is verified - use an email on that domain for "from"
-const TO_EMAIL = "Kishanpandey844@gmail.com";
-const DEFAULT_FROM_EMAIL = "noreply@janawasplot.com";
-const RAW_FROM_EMAIL = process.env.RESEND_FROM_EMAIL || DEFAULT_FROM_EMAIL;
+const TO_EMAIL = process.env.LEAD_TO_EMAIL || "Kishanpandey844@gmail.com";
 
 function extractEmail(raw: string): string {
   const v = (raw || "").toString().trim();
@@ -19,35 +15,28 @@ function isValidEmail(v: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test((v || "").trim());
 }
 
-function getFromEmail(): string {
-  const extracted = extractEmail(RAW_FROM_EMAIL);
-  if (isValidEmail(extracted)) return extracted;
-  return DEFAULT_FROM_EMAIL;
-}
-
 function formatRow(label: string, value: string | undefined): string {
   if (!value) return "";
   return `<p><strong>${label}:</strong> ${value}</p>`;
 }
 
-function sanitizeFilename(name: string): string {
-  const base = (name || "").toString().trim();
-  // Keep only safe ASCII chars; email providers can reject others.
-  const cleaned = base
-    .replace(/\s+/g, "_")
-    .replace(/[^a-zA-Z0-9._-]/g, "_")
-    .replace(/_+/g, "_")
-    .replace(/^_+|_+$/g, "");
-  // avoid empty filename
-  const limited = (cleaned || "attachment").slice(0, 120);
-  return limited || "attachment";
-}
+function getSmtpConfig() {
+  const host = (process.env.SMTP_HOST || "").trim();
+  const user = (process.env.SMTP_USER || "").trim();
+  const pass = (process.env.SMTP_PASS || "").trim();
+  const port = Number(process.env.SMTP_PORT || "587");
+  const from = (process.env.SMTP_FROM || user || "").trim();
 
-function looksLikeBase64(content: string): boolean {
-  const c = (content || "").toString().replace(/\s+/g, "");
-  if (!c) return false;
-  // tolerate base64 padding
-  return /^[A-Za-z0-9+/]+={0,2}$/.test(c);
+  const isConfigured = Boolean(host && user && pass && from && isValidEmail(extractEmail(from)));
+
+  return {
+    isConfigured,
+    host,
+    user,
+    pass,
+    port: Number.isFinite(port) ? port : 587,
+    from,
+  };
 }
 
 export async function POST(request: Request) {
@@ -87,7 +76,7 @@ export async function POST(request: Request) {
       coApplicantPhone,
       coApplicantAadhar,
       coApplicantPan,
-      attachments,
+      documents,
     } = body;
 
     if (!fullName || !email || !whatsapp) {
@@ -97,12 +86,7 @@ export async function POST(request: Request) {
       );
     }
 
-    if (!process.env.RESEND_API_KEY) {
-      return NextResponse.json(
-        { error: "Email service not configured" },
-        { status: 500 },
-      );
-    }
+    const smtp = getSmtpConfig();
 
     const isFullForm = applicantName && aadharNumber && panNumber;
     const subject = isFullForm
@@ -161,91 +145,74 @@ export async function POST(request: Request) {
       }
     }
 
-    const safeAttachments: { filename: string; content: string }[] = Array.isArray(
-      attachments,
-    )
-      ? attachments
-          .filter(
-            (a: any) =>
-              a &&
-              typeof a.filename === "string" &&
-              typeof a.content === "string" &&
-              a.filename.trim() &&
-              a.content.trim() &&
-              looksLikeBase64(a.content),
-          )
-          .map((a: any) => ({
-            filename: sanitizeFilename(a.filename),
-            // just in case base64 contains line breaks from some devices
-            content: a.content.replace(/\s+/g, ""),
+    const safeDocs: Array<{
+      field: string;
+      filename: string;
+      mime?: string;
+      bytes?: number;
+      sizeLabel?: string;
+    }> = Array.isArray(documents)
+      ? documents
+          .filter((d: any) => d && typeof d.field === "string" && typeof d.filename === "string")
+          .map((d: any) => ({
+            field: d.field,
+            filename: d.filename,
+            mime: typeof d.mime === "string" ? d.mime : undefined,
+            bytes: typeof d.bytes === "number" ? d.bytes : undefined,
+            sizeLabel: typeof d.sizeLabel === "string" ? d.sizeLabel : undefined,
           }))
       : [];
 
-    if (safeAttachments.length > 0) {
-      html += `<hr><p><strong>Attached documents:</strong> ${safeAttachments
-        .map((a) => a.filename)
-        .join(", ")}</p>`;
+    if (safeDocs.length > 0) {
+      html += `<hr><p><strong>Documents selected by user:</strong></p><ul>${safeDocs
+        .map((d) => {
+          const extra = [d.sizeLabel, d.mime].filter(Boolean).join(" • ");
+          return `<li><strong>${d.field}</strong>: ${d.filename || "-"}${extra ? ` <em>(${extra})</em>` : ""}</li>`;
+        })
+        .join("")}</ul>`;
     }
+
     html += `<hr><p><em>Sent from Jan Awas Yojna Plots - Avani Greens</em></p>`;
 
-    const emailPayload: {
-      from: string;
-      to: string[];
-      subject: string;
-      html: string;
-      attachments?: { filename: string; content: string }[];
-    } = {
-      from: `Jan Awas Yojna Plots <${getFromEmail()}>`,
-      to: [TO_EMAIL],
-      subject,
-      html,
-    };
-
-    if (safeAttachments.length > 0) {
-      emailPayload.attachments = safeAttachments;
+    if (!smtp.isConfigured) {
+      console.warn("SMTP not configured. Lead captured but email not sent.");
+      return NextResponse.json({
+        success: true,
+        warning: "SMTP not configured; email not sent.",
+      });
     }
 
-    const { data, error } = await resend.emails.send(emailPayload);
+    const transporter = nodemailer.createTransport({
+      host: smtp.host,
+      port: smtp.port,
+      secure: smtp.port === 465,
+      auth: { user: smtp.user, pass: smtp.pass },
+    });
 
-    if (error) {
-      console.error("Resend error:", error);
-      const msg = (error.message || "").toString();
-      const lower = msg.toLowerCase();
-
-      // Mobile-only issues often come from attachment filenames/content.
-      if (safeAttachments.length > 0) {
-        // Retry once WITHOUT attachments (so user can proceed to payment).
-        const retryPayload = { ...emailPayload };
-        delete retryPayload.attachments;
-        retryPayload.html +=
-          "<hr><p><strong>Note:</strong> Documents could not be attached from the device/browser. Please request docs again if needed.</p>";
-
-        const retry = await resend.emails.send(retryPayload);
-        if (!retry.error) {
-          return NextResponse.json({
-            success: true,
-            id: retry.data?.id,
-            warning: "Email sent without attachments (mobile attachment issue).",
-          });
-        }
-      }
-
-      // Resend often returns these for schema-format issues.
-      if (lower.includes("expected pattern") || lower.includes("did not match the expected pattern")) {
-        return NextResponse.json(
-          {
-            error:
-              "Email service rejected the request (format issue). Please try again or contact support.",
-          },
-          { status: 500 },
-        );
-      }
-      return NextResponse.json({ error: msg || "Failed to send" }, { status: 500 });
+    try {
+      await transporter.sendMail({
+        from: smtp.from,
+        to: TO_EMAIL,
+        subject,
+        html,
+        replyTo: isValidEmail(extractEmail(email)) ? extractEmail(email) : undefined,
+      });
+    } catch (err) {
+      console.error("SMTP send error:", err);
+      // Don't block payment; return success with warning.
+      return NextResponse.json({
+        success: true,
+        warning: "Email failed to send, but submission was received.",
+      });
     }
 
-    return NextResponse.json({ success: true, id: data?.id });
+    return NextResponse.json({ success: true });
   } catch (err) {
     console.error("Send lead error:", err);
-    return NextResponse.json({ error: "Failed to send lead" }, { status: 500 });
+    // Don't block payment on unexpected backend issues
+    return NextResponse.json(
+      { success: true, warning: "Submission received, but backend processing failed." },
+      { status: 200 },
+    );
   }
 }

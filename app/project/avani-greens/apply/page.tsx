@@ -99,74 +99,19 @@ export default function AvaniGreensApplyPage() {
     setStep2Data((prev) => ({ ...prev, [target.name]: value }));
   };
 
-  const fileToBase64 = (file: File, timeoutMs = 30000): Promise<string> =>
-    new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      const timer = window.setTimeout(() => {
-        try {
-          reader.abort();
-        } catch {
-          // ignore
-        }
-        reject(new Error("File reading timed out. Please try again."));
-      }, timeoutMs);
-
-      const cleanup = () => window.clearTimeout(timer);
-
-      reader.onload = () => {
-        cleanup();
-        const result = reader.result as string;
-        // Some devices can include whitespace/newlines in long base64 strings.
-        resolve(((result.split(",")[1] || "") + "").replace(/\s+/g, ""));
-      };
-      reader.onerror = () => {
-        cleanup();
-        reject(new Error("Failed to read file. Please try again."));
-      };
-      reader.onabort = () => {
-        cleanup();
-        reject(new Error("File reading was aborted. Please try again."));
-      };
-
-      try {
-        reader.readAsDataURL(file);
-      } catch {
-        cleanup();
-        reject(new Error("Failed to read file. Please try again."));
-      }
-    });
-
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault?.();
     setStatus("loading");
     setErrorMsg("");
 
     try {
-      const attachments: { filename: string; content: string }[] = [];
-      if (docFiles.aadhaarCard) {
-        attachments.push({
-          filename: `aadhaar_${docFiles.aadhaarCard.file.name}`,
-          content: await fileToBase64(docFiles.aadhaarCard.file),
-        });
-      }
-      if (docFiles.panCard) {
-        attachments.push({
-          filename: `pan_${docFiles.panCard.file.name}`,
-          content: await fileToBase64(docFiles.panCard.file),
-        });
-      }
-      if (docFiles.photo) {
-        attachments.push({
-          filename: `photo_${docFiles.photo.file.name}`,
-          content: await fileToBase64(docFiles.photo.file),
-        });
-      }
-      if (docFiles.cancelledCheque) {
-        attachments.push({
-          filename: `cheque_${docFiles.cancelledCheque.file.name}`,
-          content: await fileToBase64(docFiles.cancelledCheque.file),
-        });
-      }
+      const documents = Object.entries(docFiles).map(([field, v]) => ({
+        field,
+        filename: v.file?.name || "",
+        mime: v.file?.type || "",
+        bytes: v.file?.size || 0,
+        sizeLabel: v.size,
+      }));
 
       const sanitize = (s: string) =>
         (s || "").toString().trim().replace(/\s+/g, " ");
@@ -200,7 +145,7 @@ export default function AvaniGreensApplyPage() {
         coApplicantPhone: step2Data.coApplicantPhone
           ? sanitizeDigits(step2Data.coApplicantPhone)
           : step2Data.coApplicantPhone,
-        attachments,
+        documents,
       };
       const controller = new AbortController();
       const fetchTimer = window.setTimeout(() => controller.abort(), 45000);
