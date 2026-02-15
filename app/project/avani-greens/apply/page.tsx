@@ -101,13 +101,144 @@ export default function AvaniGreensApplyPage() {
 
   const handleStep1Next = (e: React.FormEvent) => {
     e.preventDefault();
-    if (step1Data.fullName && step1Data.email && step1Data.whatsapp) {
-      setStep(2);
+    const name = (step1Data.fullName || "").trim();
+    const email = (step1Data.email || "").trim();
+    const whatsapp = (step1Data.whatsapp || "").replace(/\D/g, "");
+    if (!name) {
+      setErrorMsg("Please enter your full name.");
+      return;
     }
+    if (!email) {
+      setErrorMsg("Please enter your email.");
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setErrorMsg("Please enter a valid email address.");
+      return;
+    }
+    if (!whatsapp || whatsapp.length < 10) {
+      setErrorMsg("Please enter a valid WhatsApp/Phone number (at least 10 digits).");
+      return;
+    }
+    setErrorMsg("");
+    setStep(2);
   };
 
   const handleStep2Next = (e: React.FormEvent) => {
     e.preventDefault();
+    const trim = (s: string) => (s || "").toString().trim();
+    const digits = (s: string) => (s || "").toString().replace(/\D/g, "");
+    if (!trim(step2Data.applicantName)) {
+      setErrorMsg("Please enter Applicant's Name.");
+      return;
+    }
+    if (!trim(step2Data.sonWifeDaughterOf)) {
+      setErrorMsg("Please enter Son/Wife/Daughter/Of.");
+      return;
+    }
+    if (!trim(step2Data.dateOfBirth)) {
+      setErrorMsg("Please enter Date of Birth.");
+      return;
+    }
+    if (!trim(step2Data.gender)) {
+      setErrorMsg("Please select Gender.");
+      return;
+    }
+    const phone = digits(step2Data.phone || step1Data.whatsapp);
+    if (!phone || phone.length < 10) {
+      setErrorMsg("Please enter a valid Phone/Mobile number (at least 10 digits).");
+      return;
+    }
+    const aadhar = digits(step2Data.aadharNumber);
+    if (!aadhar || aadhar.length !== 12) {
+      setErrorMsg("Please enter a valid 12-digit Aadhar Card Number.");
+      return;
+    }
+    const pan = (step2Data.panNumber || "").replace(/\s/g, "").toUpperCase();
+    if (!pan || pan.length !== 10) {
+      setErrorMsg("Please enter a valid 10-character Pan Card Number.");
+      return;
+    }
+    if (!trim(step2Data.addressLine1)) {
+      setErrorMsg("Please enter Address Line 1.");
+      return;
+    }
+    if (!trim(step2Data.city)) {
+      setErrorMsg("Please enter City.");
+      return;
+    }
+    if (!trim(step2Data.state)) {
+      setErrorMsg("Please enter State.");
+      return;
+    }
+    const pin = digits(step2Data.pinCode);
+    if (!pin || pin.length !== 6) {
+      setErrorMsg("Please enter a valid 6-digit Pin Code.");
+      return;
+    }
+    if (!trim(step2Data.accountHolderName)) {
+      setErrorMsg("Please enter Account Holder's Name.");
+      return;
+    }
+    if (!trim(step2Data.bankName)) {
+      setErrorMsg("Please enter Bank Name.");
+      return;
+    }
+    if (!digits(step2Data.accountNo)) {
+      setErrorMsg("Please enter Account No.");
+      return;
+    }
+    if (!trim(step2Data.ifscCode)) {
+      setErrorMsg("Please enter IFSC Code.");
+      return;
+    }
+    if (step2Data.applicantType === "joint") {
+      if (!trim(step2Data.coApplicantName)) {
+        setErrorMsg("Please enter Co-applicant's Name.");
+        return;
+      }
+      if (!trim(step2Data.coApplicantSonWifeDaughterOf)) {
+        setErrorMsg("Please enter Co-applicant Son/Wife/Daughter/Of.");
+        return;
+      }
+      if (!trim(step2Data.coApplicantAddress1)) {
+        setErrorMsg("Please enter Co-applicant Address Line 1.");
+        return;
+      }
+      if (!trim(step2Data.coApplicantCity)) {
+        setErrorMsg("Please enter Co-applicant City.");
+        return;
+      }
+      if (!trim(step2Data.coApplicantState)) {
+        setErrorMsg("Please enter Co-applicant State.");
+        return;
+      }
+      const coPin = digits(step2Data.coApplicantPinCode);
+      if (!coPin || coPin.length !== 6) {
+        setErrorMsg("Please enter a valid Co-applicant 6-digit Pin Code.");
+        return;
+      }
+      const coEmail = trim(step2Data.coApplicantEmail);
+      if (!coEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(coEmail)) {
+        setErrorMsg("Please enter a valid Co-applicant Email.");
+        return;
+      }
+      const coPhone = digits(step2Data.coApplicantPhone);
+      if (!coPhone || coPhone.length < 10) {
+        setErrorMsg("Please enter a valid Co-applicant Phone (at least 10 digits).");
+        return;
+      }
+      const coAadhar = digits(step2Data.coApplicantAadhar);
+      if (!coAadhar || coAadhar.length !== 12) {
+        setErrorMsg("Please enter a valid Co-applicant 12-digit Aadhaar Card No.");
+        return;
+      }
+      const coPan = (step2Data.coApplicantPan || "").replace(/\s/g, "").toUpperCase();
+      if (!coPan || coPan.length !== 10) {
+        setErrorMsg("Please enter a valid Co-applicant 10-character Pan No.");
+        return;
+      }
+    }
     const requiredDocs = ["aadhaarCard", "panCard", "photo", "cancelledCheque"];
     const missing = requiredDocs.filter((d) => !docFiles[d]);
     if (missing.length > 0) {
@@ -260,7 +391,7 @@ export default function AvaniGreensApplyPage() {
               </div>
 
               {step === 1 && (
-                <form onSubmit={handleStep1Next} className="apply-form">
+                <form onSubmit={handleStep1Next} className="apply-form" noValidate>
                   <h3 className="apply-section-title">
                     Step 1: Contact Details
                   </h3>
@@ -268,6 +399,9 @@ export default function AvaniGreensApplyPage() {
                     Please provide your basic contact information to proceed.
                   </p>
 
+                  {errorMsg && (
+                    <p className="apply-form-error">{errorMsg}</p>
+                  )}
                   <div className="apply-form-grid">
                     <div className="apply-form-group">
                       <label htmlFor="fullName">Full Name *</label>
@@ -275,7 +409,6 @@ export default function AvaniGreensApplyPage() {
                         id="fullName"
                         name="fullName"
                         type="text"
-                        required
                         value={step1Data.fullName}
                         onChange={handleStep1Change}
                         placeholder="Enter your full name"
@@ -286,8 +419,9 @@ export default function AvaniGreensApplyPage() {
                       <input
                         id="email"
                         name="email"
-                        type="email"
-                        required
+                        type="text"
+                        inputMode="email"
+                        autoComplete="email"
                         value={step1Data.email}
                         onChange={handleStep1Change}
                         placeholder="Enter your email"
@@ -298,8 +432,9 @@ export default function AvaniGreensApplyPage() {
                       <input
                         id="whatsapp"
                         name="whatsapp"
-                        type="tel"
-                        required
+                        type="text"
+                        inputMode="tel"
+                        autoComplete="tel"
                         value={step1Data.whatsapp}
                         onChange={handleStep1Change}
                         placeholder="Enter your WhatsApp number"
@@ -316,7 +451,7 @@ export default function AvaniGreensApplyPage() {
               )}
 
               {step === 2 && (
-                <form onSubmit={handleStep2Next} className="apply-form">
+                <form onSubmit={handleStep2Next} className="apply-form" noValidate>
                   {/* Category */}
                   <div className="apply-form-block">
                     <h4 className="apply-block-title">Category</h4>
@@ -387,7 +522,6 @@ export default function AvaniGreensApplyPage() {
                         <input
                           name="applicantName"
                           type="text"
-                          required
                           value={step2Data.applicantName}
                           onChange={handleStep2Change}
                           placeholder="Applicant's Name"
@@ -398,7 +532,6 @@ export default function AvaniGreensApplyPage() {
                         <input
                           name="sonWifeDaughterOf"
                           type="text"
-                          required
                           value={step2Data.sonWifeDaughterOf}
                           onChange={handleStep2Change}
                           placeholder="Son/Wife/Daughter/Of"
@@ -409,7 +542,6 @@ export default function AvaniGreensApplyPage() {
                         <input
                           name="dateOfBirth"
                           type="date"
-                          required
                           value={step2Data.dateOfBirth}
                           onChange={handleStep2Change}
                         />
@@ -418,7 +550,6 @@ export default function AvaniGreensApplyPage() {
                         <label>Gender *</label>
                         <select
                           name="gender"
-                          required
                           value={step2Data.gender}
                           onChange={handleStep2Change}
                         >
@@ -432,7 +563,8 @@ export default function AvaniGreensApplyPage() {
                         <label>Email *</label>
                         <input
                           name="email"
-                          type="email"
+                          type="text"
+                          inputMode="email"
                           value={step1Data.email}
                           readOnly
                           className="readonly"
@@ -442,8 +574,8 @@ export default function AvaniGreensApplyPage() {
                         <label>Phone/Mobile *</label>
                         <input
                           name="phone"
-                          type="tel"
-                          required
+                          type="text"
+                          inputMode="tel"
                           value={step2Data.phone || step1Data.whatsapp}
                           onChange={handleStep2Change}
                           placeholder="Phone/Mobile"
@@ -454,7 +586,7 @@ export default function AvaniGreensApplyPage() {
                         <input
                           name="aadharNumber"
                           type="text"
-                          required
+                          inputMode="numeric"
                           value={step2Data.aadharNumber}
                           onChange={handleStep2Change}
                           placeholder="Aadhar Card Number"
@@ -466,7 +598,6 @@ export default function AvaniGreensApplyPage() {
                         <input
                           name="panNumber"
                           type="text"
-                          required
                           value={step2Data.panNumber}
                           onChange={handleStep2Change}
                           placeholder="Pan Card Number"
@@ -482,7 +613,6 @@ export default function AvaniGreensApplyPage() {
                         <input
                           name="addressLine1"
                           type="text"
-                          required
                           value={step2Data.addressLine1}
                           onChange={handleStep2Change}
                           placeholder="Address Line 1"
@@ -503,7 +633,6 @@ export default function AvaniGreensApplyPage() {
                         <input
                           name="city"
                           type="text"
-                          required
                           value={step2Data.city}
                           onChange={handleStep2Change}
                           placeholder="City"
@@ -514,7 +643,6 @@ export default function AvaniGreensApplyPage() {
                         <input
                           name="state"
                           type="text"
-                          required
                           value={step2Data.state}
                           onChange={handleStep2Change}
                           placeholder="State"
@@ -525,7 +653,7 @@ export default function AvaniGreensApplyPage() {
                         <input
                           name="pinCode"
                           type="text"
-                          required
+                          inputMode="numeric"
                           value={step2Data.pinCode}
                           onChange={handleStep2Change}
                           placeholder="Pin Code"
@@ -554,7 +682,6 @@ export default function AvaniGreensApplyPage() {
                         <input
                           name="accountHolderName"
                           type="text"
-                          required
                           value={step2Data.accountHolderName}
                           onChange={handleStep2Change}
                           placeholder="Account Holder's Name"
@@ -565,7 +692,6 @@ export default function AvaniGreensApplyPage() {
                         <input
                           name="bankName"
                           type="text"
-                          required
                           value={step2Data.bankName}
                           onChange={handleStep2Change}
                           placeholder="Bank Name"
@@ -576,7 +702,7 @@ export default function AvaniGreensApplyPage() {
                         <input
                           name="accountNo"
                           type="text"
-                          required
+                          inputMode="numeric"
                           value={step2Data.accountNo}
                           onChange={handleStep2Change}
                           placeholder="Account No."
@@ -587,7 +713,6 @@ export default function AvaniGreensApplyPage() {
                         <input
                           name="ifscCode"
                           type="text"
-                          required
                           value={step2Data.ifscCode}
                           onChange={handleStep2Change}
                           placeholder="IFSC Code"
@@ -855,7 +980,6 @@ export default function AvaniGreensApplyPage() {
                           <input
                             name="coApplicantName"
                             type="text"
-                            required
                             value={step2Data.coApplicantName}
                             onChange={handleStep2Change}
                             placeholder="Co-applicant's Name"
@@ -866,7 +990,6 @@ export default function AvaniGreensApplyPage() {
                           <input
                             name="coApplicantSonWifeDaughterOf"
                             type="text"
-                            required
                             value={step2Data.coApplicantSonWifeDaughterOf}
                             onChange={handleStep2Change}
                             placeholder="Son/Wife/Daughter/Of"
@@ -877,7 +1000,6 @@ export default function AvaniGreensApplyPage() {
                           <input
                             name="coApplicantAddress1"
                             type="text"
-                            required
                             value={step2Data.coApplicantAddress1}
                             onChange={handleStep2Change}
                             placeholder="Address Line 1"
@@ -898,7 +1020,6 @@ export default function AvaniGreensApplyPage() {
                           <input
                             name="coApplicantCity"
                             type="text"
-                            required
                             value={step2Data.coApplicantCity}
                             onChange={handleStep2Change}
                             placeholder="City"
@@ -909,7 +1030,6 @@ export default function AvaniGreensApplyPage() {
                           <input
                             name="coApplicantState"
                             type="text"
-                            required
                             value={step2Data.coApplicantState}
                             onChange={handleStep2Change}
                             placeholder="State"
@@ -920,7 +1040,7 @@ export default function AvaniGreensApplyPage() {
                           <input
                             name="coApplicantPinCode"
                             type="text"
-                            required
+                            inputMode="numeric"
                             value={step2Data.coApplicantPinCode}
                             onChange={handleStep2Change}
                             placeholder="Pin Code"
@@ -931,8 +1051,8 @@ export default function AvaniGreensApplyPage() {
                           <label>Email *</label>
                           <input
                             name="coApplicantEmail"
-                            type="email"
-                            required
+                            type="text"
+                            inputMode="email"
                             value={step2Data.coApplicantEmail}
                             onChange={handleStep2Change}
                             placeholder="Email"
@@ -942,8 +1062,8 @@ export default function AvaniGreensApplyPage() {
                           <label>Phone/Mobile *</label>
                           <input
                             name="coApplicantPhone"
-                            type="tel"
-                            required
+                            type="text"
+                            inputMode="tel"
                             value={step2Data.coApplicantPhone}
                             onChange={handleStep2Change}
                             placeholder="Phone/Mobile"
@@ -954,7 +1074,7 @@ export default function AvaniGreensApplyPage() {
                           <input
                             name="coApplicantAadhar"
                             type="text"
-                            required
+                            inputMode="numeric"
                             value={step2Data.coApplicantAadhar}
                             onChange={handleStep2Change}
                             placeholder="Aadhaar Card No."
@@ -966,7 +1086,6 @@ export default function AvaniGreensApplyPage() {
                           <input
                             name="coApplicantPan"
                             type="text"
-                            required
                             value={step2Data.coApplicantPan}
                             onChange={handleStep2Change}
                             placeholder="Pan No."
