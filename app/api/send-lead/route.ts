@@ -5,11 +5,41 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 // Domain janawasplot.com is verified - use an email on that domain for "from"
 const TO_EMAIL = "Kishanpandey844@gmail.com";
-const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || "noreply@janawasplot.com";
+const DEFAULT_FROM_EMAIL = "noreply@janawasplot.com";
+const RAW_FROM_EMAIL = process.env.RESEND_FROM_EMAIL || DEFAULT_FROM_EMAIL;
+
+function extractEmail(raw: string): string {
+  const v = (raw || "").toString().trim();
+  const m = v.match(/<([^>]+)>/);
+  return (m?.[1] || v).trim();
+}
+
+function isValidEmail(v: string): boolean {
+  // Good enough for configuration validation; avoids provider schema errors.
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test((v || "").trim());
+}
+
+function getFromEmail(): string {
+  const extracted = extractEmail(RAW_FROM_EMAIL);
+  if (isValidEmail(extracted)) return extracted;
+  return DEFAULT_FROM_EMAIL;
+}
 
 function formatRow(label: string, value: string | undefined): string {
   if (!value) return "";
   return `<p><strong>${label}:</strong> ${value}</p>`;
+}
+
+function sanitizeFilename(name: string): string {
+  const base = (name || "").toString().trim();
+  // Keep only safe ASCII chars; email providers can reject others.
+  const cleaned = base
+    .replace(/\s+/g, "_")
+    .replace(/[^a-zA-Z0-9._-]/g, "_")
+    .replace(/_+/g, "_")
+    .replace(/^_+|_+$/g, "");
+  // avoid empty filename
+  return cleaned || "attachment";
 }
 
 export async function POST(request: Request) {
@@ -123,8 +153,29 @@ export async function POST(request: Request) {
       }
     }
 
-    if (attachments && attachments.length > 0) {
-      html += `<hr><p><strong>Attached documents:</strong> ${attachments.map((a: { filename: string }) => a.filename).join(", ")}</p>`;
+    const safeAttachments: { filename: string; content: string }[] = Array.isArray(
+      attachments,
+    )
+      ? attachments
+          .filter(
+            (a: any) =>
+              a &&
+              typeof a.filename === "string" &&
+              typeof a.content === "string" &&
+              a.filename.trim() &&
+              a.content.trim(),
+          )
+          .map((a: any) => ({
+            filename: sanitizeFilename(a.filename),
+            // just in case base64 contains line breaks from some devices
+            content: a.content.replace(/\s+/g, ""),
+          }))
+      : [];
+
+    if (safeAttachments.length > 0) {
+      html += `<hr><p><strong>Attached documents:</strong> ${safeAttachments
+        .map((a) => a.filename)
+        .join(", ")}</p>`;
     }
     html += `<hr><p><em>Sent from Jan Awas Yojna Plots - Avani Greens</em></p>`;
 
@@ -135,21 +186,32 @@ export async function POST(request: Request) {
       html: string;
       attachments?: { filename: string; content: string }[];
     } = {
-      from: `Jan Awas Yojna Plots <${FROM_EMAIL}>`,
+      from: `Jan Awas Yojna Plots <${getFromEmail()}>`,
       to: [TO_EMAIL],
       subject,
       html,
     };
 
-    if (attachments && Array.isArray(attachments) && attachments.length > 0) {
-      emailPayload.attachments = attachments;
+    if (safeAttachments.length > 0) {
+      emailPayload.attachments = safeAttachments;
     }
 
     const { data, error } = await resend.emails.send(emailPayload);
 
     if (error) {
       console.error("Resend error:", error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      const msg = (error.message || "").toString();
+      // Resend often returns this for invalid "from" format.
+      if (msg.toLowerCase().includes("expected pattern")) {
+        return NextResponse.json(
+          {
+            error:
+              "Email service configuration error (invalid sender email). Please contact support.",
+          },
+          { status: 500 },
+        );
+      }
+      return NextResponse.json({ error: msg || "Failed to send" }, { status: 500 });
     }
 
     return NextResponse.json({ success: true, id: data?.id });

@@ -105,7 +105,8 @@ export default function AvaniGreensApplyPage() {
       reader.readAsDataURL(file);
       reader.onload = () => {
         const result = reader.result as string;
-        resolve(result.split(",")[1] || "");
+        // Some devices can include whitespace/newlines in long base64 strings.
+        resolve(((result.split(",")[1] || "") + "").replace(/\s+/g, ""));
       };
       reader.onerror = reject;
     });
