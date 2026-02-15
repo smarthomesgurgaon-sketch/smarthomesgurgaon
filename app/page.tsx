@@ -65,7 +65,7 @@ export default function Home() {
                     key={index}
                     className={`banner-slide ${index === currentSlide ? "banner-slide-active" : "banner-slide-hidden"}`}
                   >
-                    <Image
+        <Image
                       src={image}
                       alt={`Banner ${index + 1}`}
                       fill
@@ -127,7 +127,7 @@ export default function Home() {
               <div className="banner-title-section">
                 <h1 className="banner-title">
                   JAN AWAS YOJNA PLOTTED DEVELOPMENT
-                </h1>
+          </h1>
                 <p className="banner-subtitle">
                   APPLICATIONS INVITED FOR THE ALLOTMENT OF READY-FOR-POSSESSION
                   RESIDENTIAL PLOTS UNDER JAN AWAS YOJNA, RAJASTHAN
@@ -423,9 +423,9 @@ export default function Home() {
                     </svg>{" "}
                     <a
                       href="https://www.bhartiyaaviation.in/greenfieldinfo"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
+            target="_blank"
+            rel="noopener noreferrer"
+          >
                       Press Information Construction of Greenfield Airports
                     </a>
                   </li>
@@ -454,9 +454,9 @@ export default function Home() {
                     </svg>{" "}
                     <a
                       href="https://bida.rajasthan.gov.in/content/raj/bida/en/project/Ongoing.html"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
+            target="_blank"
+            rel="noopener noreferrer"
+          >
                       BIDA Ongoing Projects
                     </a>
                   </li>

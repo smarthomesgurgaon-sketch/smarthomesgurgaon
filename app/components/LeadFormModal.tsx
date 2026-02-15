@@ -27,25 +27,6 @@ export default function LeadFormModal({ isOpen, onClose }: LeadFormModalProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const name = (formData.fullName || "").trim();
-    const email = (formData.email || "").trim();
-    const whatsapp = (formData.whatsapp || "").replace(/\D/g, "");
-    if (!name) {
-      setErrorMsg("Please enter your full name.");
-      return;
-    }
-    if (!email) {
-      setErrorMsg("Please enter your email.");
-      return;
-    }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setErrorMsg("Please enter a valid email address.");
-      return;
-    }
-    if (!whatsapp || whatsapp.length < 10) {
-      setErrorMsg("Please enter a valid number (at least 10 digits).");
-      return;
-    }
     setStatus("loading");
     setErrorMsg("");
 
@@ -96,7 +77,7 @@ export default function LeadFormModal({ isOpen, onClose }: LeadFormModalProps) {
             </button>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className={styles.form} noValidate>
+          <form onSubmit={handleSubmit} className={styles.form}>
             <div className={styles.formGroup}>
               <label htmlFor="fullName">Full Name *</label>
               <input
@@ -107,6 +88,7 @@ export default function LeadFormModal({ isOpen, onClose }: LeadFormModalProps) {
                 onChange={handleChange}
                 placeholder="Enter your full name"
                 disabled={status === "loading"}
+                required
               />
             </div>
             <div className={styles.formGroup}>
@@ -120,6 +102,7 @@ export default function LeadFormModal({ isOpen, onClose }: LeadFormModalProps) {
                 onChange={handleChange}
                 placeholder="Enter your email"
                 disabled={status === "loading"}
+                required
               />
             </div>
             <div className={styles.formGroup}>
@@ -133,6 +116,7 @@ export default function LeadFormModal({ isOpen, onClose }: LeadFormModalProps) {
                 onChange={handleChange}
                 placeholder="Enter your WhatsApp number"
                 disabled={status === "loading"}
+                required
               />
             </div>
             {status === "error" && (

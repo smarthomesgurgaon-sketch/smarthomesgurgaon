@@ -1,12 +1,11 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import Link from "next/link";
 
 const PLOT_SIZES = ["50", "80", "138", "160", "170", "200", "220", "270"];
 
 export default function AvaniGreensApplyPage() {
-  const formRef = useRef<HTMLDivElement>(null);
   const [step, setStep] = useState(1);
   const [status, setStatus] = useState<
     "idle" | "loading" | "success" | "error"
@@ -59,60 +58,6 @@ export default function AvaniGreensApplyPage() {
     Record<string, { file: File; size: string }>
   >({});
 
-  const setErrorMsgRef = useRef(setErrorMsg);
-  setErrorMsgRef.current = setErrorMsg;
-  const stepRef = useRef(step);
-  stepRef.current = step;
-
-  useEffect(() => {
-    const handleInvalid = (e: Event) => {
-      e.preventDefault();
-      e.stopPropagation();
-      e.stopImmediatePropagation();
-      const target = e.target;
-      if (target instanceof HTMLInputElement || target instanceof HTMLSelectElement || target instanceof HTMLTextAreaElement) {
-        target.setCustomValidity(" ");
-        requestAnimationFrame(() => target.setCustomValidity(""));
-      }
-      const currentStep = stepRef.current;
-      const msg = currentStep === 1
-        ? "Please fill all contact details correctly (Name, Email, Phone)."
-        : currentStep === 2
-          ? "Please fill all application details correctly. Check phone numbers (10 digits), Aadhar (12 digits), PAN (10 characters), and other required fields."
-          : "Please select a plot size and accept the terms.";
-      setErrorMsgRef.current(msg);
-    };
-    document.addEventListener("invalid", handleInvalid, true);
-    return () => document.removeEventListener("invalid", handleInvalid, true);
-  }, []);
-
-  useEffect(() => {
-    const container = formRef.current;
-    if (!container) return;
-    const inputs = container.querySelectorAll("input, select, textarea");
-    const clearValidity = (el: EventTarget | Element) => {
-      if (el instanceof HTMLInputElement || el instanceof HTMLSelectElement || el instanceof HTMLTextAreaElement) {
-        el.setCustomValidity("");
-      }
-    };
-    const handlers: Array<{ el: Element; h: () => void }> = [];
-    inputs.forEach((el) => {
-      clearValidity(el);
-      const h = () => clearValidity(el);
-      el.addEventListener("input", h);
-      el.addEventListener("change", h);
-      el.addEventListener("blur", h);
-      handlers.push({ el, h });
-    });
-    return () => {
-      handlers.forEach(({ el, h }) => {
-        el.removeEventListener("input", h);
-        el.removeEventListener("change", h);
-        el.removeEventListener("blur", h);
-      });
-    };
-  }, [step]);
-
   const handleDocFileChange = (
     field: string,
     e: React.ChangeEvent<HTMLInputElement>,
@@ -154,158 +99,6 @@ export default function AvaniGreensApplyPage() {
     setStep2Data((prev) => ({ ...prev, [target.name]: value }));
   };
 
-  const handleStep1Next = (e?: React.FormEvent) => {
-    e?.preventDefault?.();
-    const name = (step1Data.fullName || "").trim();
-    const email = (step1Data.email || "").trim();
-    const whatsapp = (step1Data.whatsapp || "").replace(/\D/g, "");
-    if (!name) {
-      setErrorMsg("Please enter your full name.");
-      return;
-    }
-    if (!email) {
-      setErrorMsg("Please enter your email.");
-      return;
-    }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setErrorMsg("Please enter a valid email address.");
-      return;
-    }
-    if (!whatsapp || whatsapp.length < 10) {
-      setErrorMsg("Please enter a valid WhatsApp/Phone number (at least 10 digits).");
-      return;
-    }
-    setErrorMsg("");
-    setStep(2);
-  };
-
-  const handleStep2Next = (e?: React.FormEvent) => {
-    e?.preventDefault?.();
-    const trim = (s: string) => (s || "").toString().trim();
-    const digits = (s: string) => (s || "").toString().replace(/\D/g, "");
-    if (!trim(step2Data.applicantName)) {
-      setErrorMsg("Please enter Applicant's Name.");
-      return;
-    }
-    if (!trim(step2Data.sonWifeDaughterOf)) {
-      setErrorMsg("Please enter Son/Wife/Daughter/Of.");
-      return;
-    }
-    if (!trim(step2Data.dateOfBirth)) {
-      setErrorMsg("Please enter Date of Birth.");
-      return;
-    }
-    if (!trim(step2Data.gender)) {
-      setErrorMsg("Please select Gender.");
-      return;
-    }
-    const phone = digits(step2Data.phone || step1Data.whatsapp);
-    if (!phone || phone.length < 10) {
-      setErrorMsg("Please enter a valid Phone/Mobile number (at least 10 digits).");
-      return;
-    }
-    const aadhar = digits(step2Data.aadharNumber);
-    if (!aadhar || aadhar.length !== 12) {
-      setErrorMsg("Please enter a valid 12-digit Aadhar Card Number.");
-      return;
-    }
-    const pan = (step2Data.panNumber || "").replace(/\s/g, "").toUpperCase();
-    if (!pan || pan.length !== 10) {
-      setErrorMsg("Please enter a valid 10-character Pan Card Number.");
-      return;
-    }
-    if (!trim(step2Data.addressLine1)) {
-      setErrorMsg("Please enter Address Line 1.");
-      return;
-    }
-    if (!trim(step2Data.city)) {
-      setErrorMsg("Please enter City.");
-      return;
-    }
-    if (!trim(step2Data.state)) {
-      setErrorMsg("Please enter State.");
-      return;
-    }
-    const pin = digits(step2Data.pinCode);
-    if (!pin || pin.length !== 6) {
-      setErrorMsg("Please enter a valid 6-digit Pin Code.");
-      return;
-    }
-    if (!trim(step2Data.accountHolderName)) {
-      setErrorMsg("Please enter Account Holder's Name.");
-      return;
-    }
-    if (!trim(step2Data.bankName)) {
-      setErrorMsg("Please enter Bank Name.");
-      return;
-    }
-    if (!digits(step2Data.accountNo)) {
-      setErrorMsg("Please enter Account No.");
-      return;
-    }
-    if (!trim(step2Data.ifscCode)) {
-      setErrorMsg("Please enter IFSC Code.");
-      return;
-    }
-    if (step2Data.applicantType === "joint") {
-      if (!trim(step2Data.coApplicantName)) {
-        setErrorMsg("Please enter Co-applicant's Name.");
-        return;
-      }
-      if (!trim(step2Data.coApplicantSonWifeDaughterOf)) {
-        setErrorMsg("Please enter Co-applicant Son/Wife/Daughter/Of.");
-        return;
-      }
-      if (!trim(step2Data.coApplicantAddress1)) {
-        setErrorMsg("Please enter Co-applicant Address Line 1.");
-        return;
-      }
-      if (!trim(step2Data.coApplicantCity)) {
-        setErrorMsg("Please enter Co-applicant City.");
-        return;
-      }
-      if (!trim(step2Data.coApplicantState)) {
-        setErrorMsg("Please enter Co-applicant State.");
-        return;
-      }
-      const coPin = digits(step2Data.coApplicantPinCode);
-      if (!coPin || coPin.length !== 6) {
-        setErrorMsg("Please enter a valid Co-applicant 6-digit Pin Code.");
-        return;
-      }
-      const coEmail = trim(step2Data.coApplicantEmail);
-      if (!coEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(coEmail)) {
-        setErrorMsg("Please enter a valid Co-applicant Email.");
-        return;
-      }
-      const coPhone = digits(step2Data.coApplicantPhone);
-      if (!coPhone || coPhone.length < 10) {
-        setErrorMsg("Please enter a valid Co-applicant Phone (at least 10 digits).");
-        return;
-      }
-      const coAadhar = digits(step2Data.coApplicantAadhar);
-      if (!coAadhar || coAadhar.length !== 12) {
-        setErrorMsg("Please enter a valid Co-applicant 12-digit Aadhaar Card No.");
-        return;
-      }
-      const coPan = (step2Data.coApplicantPan || "").replace(/\s/g, "").toUpperCase();
-      if (!coPan || coPan.length !== 10) {
-        setErrorMsg("Please enter a valid Co-applicant 10-character Pan No.");
-        return;
-      }
-    }
-    const requiredDocs = ["aadhaarCard", "panCard", "photo", "cancelledCheque"];
-    const missing = requiredDocs.filter((d) => !docFiles[d]);
-    if (missing.length > 0) {
-      setErrorMsg(
-        "Please upload all required documents: Aadhaar Card, Pan Card, Photo, and Cancelled Cheque.",
-      );
-      return;
-    }
-    setErrorMsg("");
-    setStep(3);
-  };
-
   const fileToBase64 = (file: File): Promise<string> =>
     new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -317,68 +110,8 @@ export default function AvaniGreensApplyPage() {
       reader.onerror = reject;
     });
 
-  const validateStep2Data = (): string | null => {
-    const trim = (s: string) => (s || "").toString().trim();
-    const digits = (s: string) => (s || "").toString().replace(/\D/g, "");
-    if (!trim(step2Data.applicantName)) return "Applicant's Name is required.";
-    if (!trim(step2Data.sonWifeDaughterOf)) return "Son/Wife/Daughter/Of is required.";
-    if (!trim(step2Data.dateOfBirth)) return "Date of Birth is required.";
-    if (!trim(step2Data.gender)) return "Gender is required.";
-    const phone = digits(step2Data.phone || step1Data.whatsapp);
-    if (!phone || phone.length < 10) return "Phone/Mobile must be at least 10 digits.";
-    const aadhar = digits(step2Data.aadharNumber);
-    if (!aadhar || aadhar.length !== 12) return "Aadhar Card Number must be 12 digits.";
-    const pan = (step2Data.panNumber || "").replace(/\s/g, "").toUpperCase();
-    if (!pan || pan.length !== 10) return "Pan Card Number must be 10 characters.";
-    if (!trim(step2Data.addressLine1)) return "Address Line 1 is required.";
-    if (!trim(step2Data.city)) return "City is required.";
-    if (!trim(step2Data.state)) return "State is required.";
-    const pin = digits(step2Data.pinCode);
-    if (!pin || pin.length !== 6) return "Pin Code must be 6 digits.";
-    if (!trim(step2Data.accountHolderName)) return "Account Holder's Name is required.";
-    if (!trim(step2Data.bankName)) return "Bank Name is required.";
-    if (!digits(step2Data.accountNo)) return "Account No. is required.";
-    if (!trim(step2Data.ifscCode)) return "IFSC Code is required.";
-    if (step2Data.applicantType === "joint") {
-      if (!trim(step2Data.coApplicantName)) return "Co-applicant's Name is required.";
-      if (!trim(step2Data.coApplicantSonWifeDaughterOf)) return "Co-applicant Son/Wife/Daughter/Of is required.";
-      if (!trim(step2Data.coApplicantAddress1)) return "Co-applicant Address Line 1 is required.";
-      if (!trim(step2Data.coApplicantCity)) return "Co-applicant City is required.";
-      if (!trim(step2Data.coApplicantState)) return "Co-applicant State is required.";
-      const coPin = digits(step2Data.coApplicantPinCode);
-      if (!coPin || coPin.length !== 6) return "Co-applicant Pin Code must be 6 digits.";
-      const coEmail = trim(step2Data.coApplicantEmail);
-      if (!coEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(coEmail)) return "Co-applicant Email is invalid.";
-      const coPhone = digits(step2Data.coApplicantPhone);
-      if (!coPhone || coPhone.length < 10) return "Co-applicant Phone must be at least 10 digits.";
-      const coAadhar = digits(step2Data.coApplicantAadhar);
-      if (!coAadhar || coAadhar.length !== 12) return "Co-applicant Aadhaar must be 12 digits.";
-      const coPan = (step2Data.coApplicantPan || "").replace(/\s/g, "").toUpperCase();
-      if (!coPan || coPan.length !== 10) return "Co-applicant Pan must be 10 characters.";
-    }
-    const requiredDocs = ["aadhaarCard", "panCard", "photo", "cancelledCheque"];
-    const missing = requiredDocs.filter((d) => !docFiles[d]);
-    if (missing.length > 0) return "Please upload all documents: Aadhaar Card, Pan Card, Photo, Cancelled Cheque.";
-    return null;
-  };
-
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault?.();
-    if (!step2Data.plotSize) {
-      setErrorMsg("Please select a plot size.");
-      return;
-    }
-    if (!step2Data.termsAccepted) {
-      setErrorMsg(
-        "You must accept the Terms and Conditions and Privacy Policy",
-      );
-      return;
-    }
-    const step2Error = validateStep2Data();
-    if (step2Error) {
-      setErrorMsg(`${step2Error} Please go back to Step 2 to fix.`);
-      return;
-    }
     setStatus("loading");
     setErrorMsg("");
 
@@ -477,11 +210,7 @@ export default function AvaniGreensApplyPage() {
             </div>
 
             <div
-              ref={formRef}
               className="apply-form-steps"
-              onKeyDown={(e) => {
-                if (e.key === "Enter") e.preventDefault();
-              }}
             >
               <div className="apply-progress-wrap">
                 <span className="apply-progress-label">
@@ -503,7 +232,14 @@ export default function AvaniGreensApplyPage() {
 
               <div key={step}>
               {step === 1 && (
-                <div className="apply-form">
+                <form
+                  className="apply-form"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    setErrorMsg("");
+                    setStep(2);
+                  }}
+                >
                   <h3 className="apply-section-title">
                     Step 1: Contact Details
                   </h3>
@@ -511,9 +247,6 @@ export default function AvaniGreensApplyPage() {
                     Please provide your basic contact information to proceed.
                   </p>
 
-                  {errorMsg && (
-                    <p className="apply-form-error">{errorMsg}</p>
-                  )}
                   <div className="apply-form-grid">
                     <div className="apply-form-group">
                       <label htmlFor="fullName">Full Name *</label>
@@ -524,6 +257,7 @@ export default function AvaniGreensApplyPage() {
                         value={step1Data.fullName}
                         onChange={handleStep1Change}
                         placeholder="Enter your full name"
+                        required
                       />
                     </div>
                     <div className="apply-form-group">
@@ -537,6 +271,7 @@ export default function AvaniGreensApplyPage() {
                         value={step1Data.email}
                         onChange={handleStep1Change}
                         placeholder="Enter your email"
+                        required
                       />
                     </div>
                     <div className="apply-form-group">
@@ -550,24 +285,31 @@ export default function AvaniGreensApplyPage() {
                         value={step1Data.whatsapp}
                         onChange={handleStep1Change}
                         placeholder="Enter your WhatsApp number"
+                        required
                       />
                     </div>
                   </div>
 
                   <div className="apply-form-actions">
                     <button
-                      type="button"
+                      type="submit"
                       className="btn-apply-next"
-                      onClick={handleStep1Next}
                     >
                       Next →
                     </button>
                   </div>
-                </div>
+                </form>
               )}
 
               {step === 2 && (
-                <div className="apply-form">
+                <form
+                  className="apply-form"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    setErrorMsg("");
+                    setStep(3);
+                  }}
+                >
                   {/* Category */}
                   <div className="apply-form-block">
                     <h4 className="apply-block-title">Category</h4>
@@ -641,6 +383,7 @@ export default function AvaniGreensApplyPage() {
                           value={step2Data.applicantName}
                           onChange={handleStep2Change}
                           placeholder="Applicant's Name"
+                          required
                         />
                       </div>
                       <div className="apply-form-group">
@@ -651,6 +394,7 @@ export default function AvaniGreensApplyPage() {
                           value={step2Data.sonWifeDaughterOf}
                           onChange={handleStep2Change}
                           placeholder="Son/Wife/Daughter/Of"
+                          required
                         />
                       </div>
                       <div className="apply-form-group">
@@ -660,6 +404,7 @@ export default function AvaniGreensApplyPage() {
                           type="date"
                           value={step2Data.dateOfBirth}
                           onChange={handleStep2Change}
+                          required
                         />
                       </div>
                       <div className="apply-form-group">
@@ -668,6 +413,7 @@ export default function AvaniGreensApplyPage() {
                           name="gender"
                           value={step2Data.gender}
                           onChange={handleStep2Change}
+                          required
                         >
                           <option value="">Select</option>
                           <option value="Male">Male</option>
@@ -695,6 +441,7 @@ export default function AvaniGreensApplyPage() {
                           value={step2Data.phone || step1Data.whatsapp}
                           onChange={handleStep2Change}
                           placeholder="Phone/Mobile"
+                          required
                         />
                       </div>
                       <div className="apply-form-group">
@@ -707,6 +454,7 @@ export default function AvaniGreensApplyPage() {
                           onChange={handleStep2Change}
                           placeholder="Aadhar Card Number"
                           maxLength={12}
+                          required
                         />
                       </div>
                       <div className="apply-form-group">
@@ -718,6 +466,7 @@ export default function AvaniGreensApplyPage() {
                           onChange={handleStep2Change}
                           placeholder="Pan Card Number"
                           maxLength={10}
+                          required
                         />
                       </div>
                     </div>
@@ -732,6 +481,7 @@ export default function AvaniGreensApplyPage() {
                           value={step2Data.addressLine1}
                           onChange={handleStep2Change}
                           placeholder="Address Line 1"
+                          required
                         />
                       </div>
                       <div className="apply-form-group apply-full">
@@ -752,6 +502,7 @@ export default function AvaniGreensApplyPage() {
                           value={step2Data.city}
                           onChange={handleStep2Change}
                           placeholder="City"
+                          required
                         />
                       </div>
                       <div className="apply-form-group">
@@ -762,6 +513,7 @@ export default function AvaniGreensApplyPage() {
                           value={step2Data.state}
                           onChange={handleStep2Change}
                           placeholder="State"
+                          required
                         />
                       </div>
                       <div className="apply-form-group">
@@ -774,6 +526,7 @@ export default function AvaniGreensApplyPage() {
                           onChange={handleStep2Change}
                           placeholder="Pin Code"
                           maxLength={6}
+                          required
                         />
                       </div>
                       <div className="apply-form-group">
@@ -801,6 +554,7 @@ export default function AvaniGreensApplyPage() {
                           value={step2Data.accountHolderName}
                           onChange={handleStep2Change}
                           placeholder="Account Holder's Name"
+                          required
                         />
                       </div>
                       <div className="apply-form-group">
@@ -811,6 +565,7 @@ export default function AvaniGreensApplyPage() {
                           value={step2Data.bankName}
                           onChange={handleStep2Change}
                           placeholder="Bank Name"
+                          required
                         />
                       </div>
                       <div className="apply-form-group">
@@ -822,6 +577,7 @@ export default function AvaniGreensApplyPage() {
                           value={step2Data.accountNo}
                           onChange={handleStep2Change}
                           placeholder="Account No."
+                          required
                         />
                       </div>
                       <div className="apply-form-group">
@@ -832,6 +588,7 @@ export default function AvaniGreensApplyPage() {
                           value={step2Data.ifscCode}
                           onChange={handleStep2Change}
                           placeholder="IFSC Code"
+                          required
                         />
                       </div>
                     </div>
@@ -861,6 +618,7 @@ export default function AvaniGreensApplyPage() {
                               handleDocFileChange("aadhaarCard", e)
                             }
                             className="apply-doc-file-input"
+                            required
                           />
                           <label
                             htmlFor="aadhaarCard"
@@ -920,6 +678,7 @@ export default function AvaniGreensApplyPage() {
                             accept=".pdf,.jpg,.jpeg,.png"
                             onChange={(e) => handleDocFileChange("panCard", e)}
                             className="apply-doc-file-input"
+                            required
                           />
                           <label
                             htmlFor="panCard"
@@ -979,6 +738,7 @@ export default function AvaniGreensApplyPage() {
                             accept=".jpg,.jpeg,.png"
                             onChange={(e) => handleDocFileChange("photo", e)}
                             className="apply-doc-file-input"
+                            required
                           />
                           <label
                             htmlFor="photo"
@@ -1041,6 +801,7 @@ export default function AvaniGreensApplyPage() {
                               handleDocFileChange("cancelledCheque", e)
                             }
                             className="apply-doc-file-input"
+                            required
                           />
                           <label
                             htmlFor="cancelledCheque"
@@ -1099,6 +860,7 @@ export default function AvaniGreensApplyPage() {
                             value={step2Data.coApplicantName}
                             onChange={handleStep2Change}
                             placeholder="Co-applicant's Name"
+                            required
                           />
                         </div>
                         <div className="apply-form-group">
@@ -1109,6 +871,7 @@ export default function AvaniGreensApplyPage() {
                             value={step2Data.coApplicantSonWifeDaughterOf}
                             onChange={handleStep2Change}
                             placeholder="Son/Wife/Daughter/Of"
+                            required
                           />
                         </div>
                         <div className="apply-form-group apply-full">
@@ -1119,6 +882,7 @@ export default function AvaniGreensApplyPage() {
                             value={step2Data.coApplicantAddress1}
                             onChange={handleStep2Change}
                             placeholder="Address Line 1"
+                            required
                           />
                         </div>
                         <div className="apply-form-group apply-full">
@@ -1139,6 +903,7 @@ export default function AvaniGreensApplyPage() {
                             value={step2Data.coApplicantCity}
                             onChange={handleStep2Change}
                             placeholder="City"
+                            required
                           />
                         </div>
                         <div className="apply-form-group">
@@ -1149,6 +914,7 @@ export default function AvaniGreensApplyPage() {
                             value={step2Data.coApplicantState}
                             onChange={handleStep2Change}
                             placeholder="State"
+                            required
                           />
                         </div>
                         <div className="apply-form-group">
@@ -1161,6 +927,7 @@ export default function AvaniGreensApplyPage() {
                             onChange={handleStep2Change}
                             placeholder="Pin Code"
                             maxLength={6}
+                            required
                           />
                         </div>
                         <div className="apply-form-group">
@@ -1172,6 +939,7 @@ export default function AvaniGreensApplyPage() {
                             value={step2Data.coApplicantEmail}
                             onChange={handleStep2Change}
                             placeholder="Email"
+                            required
                           />
                         </div>
                         <div className="apply-form-group">
@@ -1183,6 +951,7 @@ export default function AvaniGreensApplyPage() {
                             value={step2Data.coApplicantPhone}
                             onChange={handleStep2Change}
                             placeholder="Phone/Mobile"
+                            required
                           />
                         </div>
                         <div className="apply-form-group">
@@ -1195,6 +964,7 @@ export default function AvaniGreensApplyPage() {
                             onChange={handleStep2Change}
                             placeholder="Aadhaar Card No."
                             maxLength={12}
+                            required
                           />
                         </div>
                         <div className="apply-form-group">
@@ -1206,15 +976,13 @@ export default function AvaniGreensApplyPage() {
                             onChange={handleStep2Change}
                             placeholder="Pan No."
                             maxLength={10}
+                            required
                           />
                         </div>
                       </div>
                     </div>
                   )}
 
-                  {errorMsg && (
-                    <p className="apply-form-error">{errorMsg}</p>
-                  )}
                   <div className="apply-form-actions apply-form-actions-two">
                     <button
                       type="button"
@@ -1227,18 +995,17 @@ export default function AvaniGreensApplyPage() {
                       Previous
                     </button>
                     <button
-                      type="button"
+                      type="submit"
                       className="btn-apply-next"
-                      onClick={handleStep2Next}
                     >
                       Next →
                     </button>
                   </div>
-                </div>
+                </form>
               )}
 
               {step === 3 && (
-                <div className="apply-form apply-step-three">
+                <form className="apply-form apply-step-three" onSubmit={handleSubmit}>
                   <h3 className="apply-step3-title">
                     {step2Data.category === "general"
                       ? "PRICE FOR GENERAL APPLICANTS"
@@ -1447,11 +1214,7 @@ export default function AvaniGreensApplyPage() {
                           value={size}
                           checked={step2Data.plotSize === size}
                           onChange={handleStep2Change}
-                          onInvalid={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            (e.target as HTMLInputElement).setCustomValidity("");
-                          }}
+                          required={size === PLOT_SIZES[0]}
                         />
                         {size} Sq. Yd
                       </label>
@@ -1484,11 +1247,7 @@ export default function AvaniGreensApplyPage() {
                         name="termsAccepted"
                         checked={step2Data.termsAccepted}
                         onChange={handleStep2Change}
-                        onInvalid={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          (e.target as HTMLInputElement).setCustomValidity("");
-                        }}
+                        required
                       />
                       <span>
                         I have read and agree to the{" "}
@@ -1520,15 +1279,14 @@ export default function AvaniGreensApplyPage() {
                       Previous
                     </button>
                     <button
-                      type="button"
+                      type="submit"
                       className="btn-apply-submit"
                       disabled={status === "loading"}
-                      onClick={() => handleSubmit()}
                     >
                       {status === "loading" ? "Submitting..." : "Submit & Pay"}
                     </button>
                   </div>
-                </div>
+                </form>
               )}
               </div>
             </div>
