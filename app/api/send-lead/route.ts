@@ -46,6 +46,7 @@ export async function POST(request: Request) {
       fullName,
       email,
       whatsapp,
+      leadStage,
       category,
       applicantType,
       applicantName,
@@ -89,12 +90,15 @@ export async function POST(request: Request) {
     const smtp = getSmtpConfig();
 
     const isFullForm = applicantName && aadharNumber && panNumber;
+    const isStep1Only = leadStage === "step1";
     const subject = isFullForm
       ? `New Application: ${applicantName} - Avani Greens`
-      : `New Lead: ${fullName} - Jan Awas Yojna Plots`;
+      : isStep1Only
+        ? `New Lead (Step 1): ${fullName} - Jan Awas Yojna Plots`
+        : `New Lead: ${fullName} - Jan Awas Yojna Plots`;
 
     let html = `
-      <h2>New ${isFullForm ? "Application" : "Lead Request"}</h2>
+      <h2>New ${isFullForm ? "Application" : isStep1Only ? "Lead (Step 1)" : "Lead Request"}</h2>
       <h3>Contact Details (Step 1)</h3>
       ${formatRow("Full Name", fullName)}
       ${formatRow("Email", email)}
@@ -189,10 +193,13 @@ export async function POST(request: Request) {
       auth: { user: smtp.user, pass: smtp.pass },
     });
 
+    const STEP1_TO_EMAIL = "kishan.larisarealtech@gmail.com";
+    const toList = isStep1Only ? [TO_EMAIL, STEP1_TO_EMAIL] : [TO_EMAIL];
+
     try {
       await transporter.sendMail({
         from: smtp.from,
-        to: TO_EMAIL,
+        to: toList,
         subject,
         html,
         replyTo: isValidEmail(extractEmail(email)) ? extractEmail(email) : undefined,

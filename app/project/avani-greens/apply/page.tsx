@@ -217,6 +217,22 @@ export default function AvaniGreensApplyPage() {
                     e.preventDefault();
                     setErrorMsg("");
                     setStep(2);
+
+                    // Fire-and-forget: send Step 1 details email (does not block the user)
+                    try {
+                      void fetch("/api/send-lead", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                          fullName: step1Data.fullName,
+                          email: step1Data.email,
+                          whatsapp: step1Data.whatsapp,
+                          leadStage: "step1",
+                        }),
+                      });
+                    } catch {
+                      // ignore
+                    }
                   }}
                 >
                   <h3 className="apply-section-title">
