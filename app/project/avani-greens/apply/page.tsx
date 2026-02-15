@@ -11,6 +11,7 @@ export default function AvaniGreensApplyPage() {
     "idle" | "loading" | "success" | "error"
   >("idle");
   const [errorMsg, setErrorMsg] = useState("");
+  const MAX_DOC_BYTES = 300 * 1024; // 300KB max per file
 
   const [step1Data, setStep1Data] = useState({
     fullName: "",
@@ -64,6 +65,17 @@ export default function AvaniGreensApplyPage() {
   ) => {
     const file = e.target.files?.[0];
     if (file) {
+      if (file.size > MAX_DOC_BYTES) {
+        setErrorMsg("Each document must be 300KB or less. Please upload a smaller file.");
+        // clear the input and keep previous state clean for this field
+        e.target.value = "";
+        setDocFiles((prev) => {
+          const next = { ...prev };
+          delete next[field];
+          return next;
+        });
+        return;
+      }
       const size =
         file.size < 1024
           ? `${file.size}B`
@@ -604,6 +616,12 @@ export default function AvaniGreensApplyPage() {
                         <label>
                           Aadhaar Card{" "}
                           <span className="required-asterisk">*</span>
+                          <span className="apply-doc-max">(Max 300KB)</span>
+                          {docFiles.aadhaarCard && (
+                            <span className="apply-doc-selected-size">
+                              ({docFiles.aadhaarCard.size})
+                            </span>
+                          )}
                           <span
                             className="apply-doc-info-icon"
                             title="Upload Aadhaar Card"
@@ -666,6 +684,12 @@ export default function AvaniGreensApplyPage() {
                       <div className="apply-doc-field">
                         <label>
                           Pan Card <span className="required-asterisk">*</span>
+                          <span className="apply-doc-max">(Max 300KB)</span>
+                          {docFiles.panCard && (
+                            <span className="apply-doc-selected-size">
+                              ({docFiles.panCard.size})
+                            </span>
+                          )}
                           <span
                             className="apply-doc-info-icon"
                             title="Upload Pan Card"
@@ -726,6 +750,12 @@ export default function AvaniGreensApplyPage() {
                       <div className="apply-doc-field">
                         <label>
                           Photo <span className="required-asterisk">*</span>
+                          <span className="apply-doc-max">(Max 300KB)</span>
+                          {docFiles.photo && (
+                            <span className="apply-doc-selected-size">
+                              ({docFiles.photo.size})
+                            </span>
+                          )}
                           <span
                             className="apply-doc-info-icon"
                             title="Upload Photo"
@@ -787,6 +817,12 @@ export default function AvaniGreensApplyPage() {
                         <label>
                           Cancelled Cheque{" "}
                           <span className="required-asterisk">*</span>
+                          <span className="apply-doc-max">(Max 300KB)</span>
+                          {docFiles.cancelledCheque && (
+                            <span className="apply-doc-selected-size">
+                              ({docFiles.cancelledCheque.size})
+                            </span>
+                          )}
                           <span
                             className="apply-doc-info-icon"
                             title="Upload Cancelled Cheque"

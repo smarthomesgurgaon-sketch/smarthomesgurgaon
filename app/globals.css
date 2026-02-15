@@ -2338,6 +2338,18 @@ a.contact-value:hover {
   gap: 0.25rem;
 }
 
+.apply-doc-max {
+  font-size: 0.8125rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.apply-doc-selected-size {
+  font-size: 0.8125rem;
+  color: #111827;
+  font-weight: 600;
+}
+
 .apply-doc-info-icon {
   display: inline-flex;
   align-items: center;
