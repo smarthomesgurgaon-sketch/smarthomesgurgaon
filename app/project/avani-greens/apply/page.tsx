@@ -133,6 +133,10 @@ export default function AvaniGreensApplyPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!step2Data.plotSize) {
+      setErrorMsg("Please select a plot size.");
+      return;
+    }
     if (!step2Data.termsAccepted) {
       setErrorMsg(
         "You must accept the Terms and Conditions and Privacy Policy",
@@ -169,14 +173,44 @@ export default function AvaniGreensApplyPage() {
         });
       }
 
+      const sanitize = (s: string) =>
+        (s || "").toString().trim().replace(/\s+/g, " ");
+      const sanitizeDigits = (s: string) =>
+        (s || "").toString().replace(/\D/g, "");
+      const payload = {
+        ...step1Data,
+        fullName: sanitize(step1Data.fullName),
+        email: sanitize(step1Data.email),
+        whatsapp: sanitizeDigits(step1Data.whatsapp) || step1Data.whatsapp,
+        ...step2Data,
+        applicantName: sanitize(step2Data.applicantName),
+        aadharNumber: sanitizeDigits(step2Data.aadharNumber) || step2Data.aadharNumber,
+        panNumber: (step2Data.panNumber || "").toString().replace(/\s/g, "").toUpperCase(),
+        phone: sanitizeDigits(step2Data.phone || step1Data.whatsapp) || step2Data.phone || step1Data.whatsapp,
+        addressLine1: sanitize(step2Data.addressLine1),
+        addressLine2: sanitize(step2Data.addressLine2),
+        city: sanitize(step2Data.city),
+        state: sanitize(step2Data.state),
+        pinCode: sanitizeDigits(step2Data.pinCode) || step2Data.pinCode,
+        accountHolderName: sanitize(step2Data.accountHolderName),
+        bankName: sanitize(step2Data.bankName),
+        accountNo: sanitizeDigits(step2Data.accountNo) || step2Data.accountNo,
+        ifscCode: (step2Data.ifscCode || "").toString().replace(/\s/g, "").toUpperCase(),
+        coApplicantAadhar: step2Data.coApplicantAadhar
+          ? sanitizeDigits(step2Data.coApplicantAadhar)
+          : step2Data.coApplicantAadhar,
+        coApplicantPan: step2Data.coApplicantPan
+          ? (step2Data.coApplicantPan + "").replace(/\s/g, "").toUpperCase()
+          : step2Data.coApplicantPan,
+        coApplicantPhone: step2Data.coApplicantPhone
+          ? sanitizeDigits(step2Data.coApplicantPhone)
+          : step2Data.coApplicantPhone,
+        attachments,
+      };
       const res = await fetch("/api/send-lead", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...step1Data,
-          ...step2Data,
-          attachments,
-        }),
+        body: JSON.stringify(payload),
       });
 
       const data = await res.json();
@@ -971,6 +1005,7 @@ export default function AvaniGreensApplyPage() {
                 <form
                   onSubmit={handleSubmit}
                   className="apply-form apply-step-three"
+                  noValidate
                 >
                   <h3 className="apply-step3-title">
                     {step2Data.category === "general"
@@ -1178,7 +1213,6 @@ export default function AvaniGreensApplyPage() {
                           type="radio"
                           name="plotSize"
                           value={size}
-                          required
                           checked={step2Data.plotSize === size}
                           onChange={handleStep2Change}
                         />
@@ -1212,7 +1246,6 @@ export default function AvaniGreensApplyPage() {
                       name="termsAccepted"
                       checked={step2Data.termsAccepted}
                       onChange={handleStep2Change}
-                      required
                     />
                     I have read and agree to the{" "}
                     <Link href="/terms" target="_blank">
