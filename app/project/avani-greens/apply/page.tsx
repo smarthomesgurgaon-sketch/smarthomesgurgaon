@@ -59,10 +59,26 @@ export default function AvaniGreensApplyPage() {
     Record<string, { file: File; size: string }>
   >({});
 
+  const setErrorMsgRef = useRef(setErrorMsg);
+  setErrorMsgRef.current = setErrorMsg;
+  const stepRef = useRef(step);
+  stepRef.current = step;
+
   useEffect(() => {
     const handleInvalid = (e: Event) => {
       e.preventDefault();
       e.stopPropagation();
+      const target = e.target;
+      if (target instanceof HTMLInputElement || target instanceof HTMLSelectElement || target instanceof HTMLTextAreaElement) {
+        target.setCustomValidity("");
+      }
+      const currentStep = stepRef.current;
+      const msg = currentStep === 1
+        ? "Please fill all contact details correctly (Name, Email, Phone)."
+        : currentStep === 2
+          ? "Please fill all application details correctly. Check phone numbers (10 digits), Aadhar (12 digits), PAN (10 characters), and other required fields."
+          : "Please select a plot size and accept the terms.";
+      setErrorMsgRef.current(msg);
     };
     document.addEventListener("invalid", handleInvalid, true);
     return () => document.removeEventListener("invalid", handleInvalid, true);
@@ -299,6 +315,51 @@ export default function AvaniGreensApplyPage() {
       reader.onerror = reject;
     });
 
+  const validateStep2Data = (): string | null => {
+    const trim = (s: string) => (s || "").toString().trim();
+    const digits = (s: string) => (s || "").toString().replace(/\D/g, "");
+    if (!trim(step2Data.applicantName)) return "Applicant's Name is required.";
+    if (!trim(step2Data.sonWifeDaughterOf)) return "Son/Wife/Daughter/Of is required.";
+    if (!trim(step2Data.dateOfBirth)) return "Date of Birth is required.";
+    if (!trim(step2Data.gender)) return "Gender is required.";
+    const phone = digits(step2Data.phone || step1Data.whatsapp);
+    if (!phone || phone.length < 10) return "Phone/Mobile must be at least 10 digits.";
+    const aadhar = digits(step2Data.aadharNumber);
+    if (!aadhar || aadhar.length !== 12) return "Aadhar Card Number must be 12 digits.";
+    const pan = (step2Data.panNumber || "").replace(/\s/g, "").toUpperCase();
+    if (!pan || pan.length !== 10) return "Pan Card Number must be 10 characters.";
+    if (!trim(step2Data.addressLine1)) return "Address Line 1 is required.";
+    if (!trim(step2Data.city)) return "City is required.";
+    if (!trim(step2Data.state)) return "State is required.";
+    const pin = digits(step2Data.pinCode);
+    if (!pin || pin.length !== 6) return "Pin Code must be 6 digits.";
+    if (!trim(step2Data.accountHolderName)) return "Account Holder's Name is required.";
+    if (!trim(step2Data.bankName)) return "Bank Name is required.";
+    if (!digits(step2Data.accountNo)) return "Account No. is required.";
+    if (!trim(step2Data.ifscCode)) return "IFSC Code is required.";
+    if (step2Data.applicantType === "joint") {
+      if (!trim(step2Data.coApplicantName)) return "Co-applicant's Name is required.";
+      if (!trim(step2Data.coApplicantSonWifeDaughterOf)) return "Co-applicant Son/Wife/Daughter/Of is required.";
+      if (!trim(step2Data.coApplicantAddress1)) return "Co-applicant Address Line 1 is required.";
+      if (!trim(step2Data.coApplicantCity)) return "Co-applicant City is required.";
+      if (!trim(step2Data.coApplicantState)) return "Co-applicant State is required.";
+      const coPin = digits(step2Data.coApplicantPinCode);
+      if (!coPin || coPin.length !== 6) return "Co-applicant Pin Code must be 6 digits.";
+      const coEmail = trim(step2Data.coApplicantEmail);
+      if (!coEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(coEmail)) return "Co-applicant Email is invalid.";
+      const coPhone = digits(step2Data.coApplicantPhone);
+      if (!coPhone || coPhone.length < 10) return "Co-applicant Phone must be at least 10 digits.";
+      const coAadhar = digits(step2Data.coApplicantAadhar);
+      if (!coAadhar || coAadhar.length !== 12) return "Co-applicant Aadhaar must be 12 digits.";
+      const coPan = (step2Data.coApplicantPan || "").replace(/\s/g, "").toUpperCase();
+      if (!coPan || coPan.length !== 10) return "Co-applicant Pan must be 10 characters.";
+    }
+    const requiredDocs = ["aadhaarCard", "panCard", "photo", "cancelledCheque"];
+    const missing = requiredDocs.filter((d) => !docFiles[d]);
+    if (missing.length > 0) return "Please upload all documents: Aadhaar Card, Pan Card, Photo, Cancelled Cheque.";
+    return null;
+  };
+
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault?.();
     if (!step2Data.plotSize) {
@@ -309,6 +370,11 @@ export default function AvaniGreensApplyPage() {
       setErrorMsg(
         "You must accept the Terms and Conditions and Privacy Policy",
       );
+      return;
+    }
+    const step2Error = validateStep2Data();
+    if (step2Error) {
+      setErrorMsg(`${step2Error} Please go back to Step 2 to fix.`);
       return;
     }
     setStatus("loading");
@@ -408,7 +474,13 @@ export default function AvaniGreensApplyPage() {
               </Link>
             </div>
 
-            <div className="apply-form-steps" ref={formRef}>
+            <div
+              ref={formRef}
+              className="apply-form-steps"
+              onKeyDown={(e) => {
+                if (e.key === "Enter") e.preventDefault();
+              }}
+            >
               <div className="apply-progress-wrap">
                 <span className="apply-progress-label">
                   Step {step} of 3 -
@@ -1397,24 +1469,28 @@ export default function AvaniGreensApplyPage() {
                     </p>
                   </div>
 
-                  <label className="apply-terms-label">
-                    <input
-                      type="checkbox"
-                      name="termsAccepted"
-                      checked={step2Data.termsAccepted}
-                      onChange={handleStep2Change}
-                    />
-                    I have read and agree to the{" "}
-                    <Link href="/terms" target="_blank">
-                      Terms and Conditions
-                    </Link>{" "}
-                    and{" "}
-                    <Link href="/privacy-policy" target="_blank">
-                      Privacy Policy
-                    </Link>
-                  </label>
+                  <div className="apply-terms-label">
+                    <label style={{ cursor: "pointer" }}>
+                      <input
+                        type="checkbox"
+                        name="termsAccepted"
+                        checked={step2Data.termsAccepted}
+                        onChange={handleStep2Change}
+                      />
+                      <span>
+                        I have read and agree to the{" "}
+                        <Link href="/terms" target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>
+                          Terms and Conditions
+                        </Link>{" "}
+                        and{" "}
+                        <Link href="/privacy-policy" target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>
+                          Privacy Policy
+                        </Link>
+                      </span>
+                    </label>
+                  </div>
 
-                  {status === "error" && (
+                  {(errorMsg || status === "error") && (
                     <p className="apply-form-error">{errorMsg}</p>
                   )}
 
