@@ -20,6 +20,17 @@ function formatRow(label: string, value: string | undefined): string {
   return `<p><strong>${label}:</strong> ${value}</p>`;
 }
 
+function sanitizeFilename(name: string): string {
+  const base = (name || "").toString().trim();
+  const cleaned = base
+    .replace(/\s+/g, "_")
+    .replace(/[^a-zA-Z0-9._-]/g, "_")
+    .replace(/_+/g, "_")
+    .replace(/^_+|_+$/g, "");
+  const limited = (cleaned || "attachment").slice(0, 120);
+  return limited || "attachment";
+}
+
 function getSmtpConfig() {
   const host = (process.env.SMTP_HOST || "").trim();
   const user = (process.env.SMTP_USER || "").trim();
@@ -39,9 +50,42 @@ function getSmtpConfig() {
   };
 }
 
+function safeSerializeSmtpError(err: unknown) {
+  const e = err as any;
+  return {
+    name: typeof e?.name === "string" ? e.name : undefined,
+    code: typeof e?.code === "string" ? e.code : undefined,
+    command: typeof e?.command === "string" ? e.command : undefined,
+    responseCode: typeof e?.responseCode === "number" ? e.responseCode : undefined,
+    // response can include useful server reason (e.g. 535-5.7.8 ...)
+    response: typeof e?.response === "string" ? e.response : undefined,
+    message: typeof e?.message === "string" ? e.message : String(err),
+  };
+}
+
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
+    const contentType = request.headers.get("content-type") || "";
+    const isMultipart = contentType.toLowerCase().includes("multipart/form-data");
+
+    let body: any = {};
+    let uploadedFiles: Record<string, File> = {};
+
+    if (isMultipart) {
+      const fd = await request.formData();
+      const rawPayload = fd.get("payload");
+      if (typeof rawPayload === "string" && rawPayload.trim()) {
+        body = JSON.parse(rawPayload);
+      }
+      const keys = ["aadhaarCard", "panCard", "photo", "cancelledCheque"];
+      keys.forEach((k) => {
+        const f = fd.get(k);
+        if (f instanceof File) uploadedFiles[k] = f;
+      });
+    } else {
+      body = await request.json();
+    }
+
     const {
       fullName,
       email,
@@ -196,6 +240,20 @@ export async function POST(request: Request) {
     const STEP1_TO_EMAIL = "kishan.larisarealtech@gmail.com";
     const toList = isStep1Only ? [TO_EMAIL, STEP1_TO_EMAIL] : [TO_EMAIL];
 
+    const attachments = isMultipart
+      ? await Promise.all(
+          Object.entries(uploadedFiles).map(async ([field, f]) => {
+            const ab = await f.arrayBuffer();
+            const buf = Buffer.from(ab);
+            return {
+              filename: sanitizeFilename(f.name || `${field}`),
+              content: buf,
+              contentType: f.type || undefined,
+            };
+          }),
+        )
+      : undefined;
+
     try {
       await transporter.sendMail({
         from: smtp.from,
@@ -203,6 +261,7 @@ export async function POST(request: Request) {
         subject,
         html,
         replyTo: isValidEmail(extractEmail(email)) ? extractEmail(email) : undefined,
+        attachments: attachments && attachments.length > 0 ? attachments : undefined,
       });
     } catch (err) {
       console.error("SMTP send error:", err);
@@ -210,6 +269,18 @@ export async function POST(request: Request) {
       return NextResponse.json({
         success: true,
         warning: "Email failed to send, but submission was received.",
+        debug:
+          process.env.NODE_ENV !== "production"
+            ? {
+                smtp: {
+                  host: smtp.host,
+                  port: smtp.port,
+                  user: smtp.user ? `***@${smtp.user.split("@")[1] || "unknown"}` : undefined,
+                  from: smtp.from,
+                },
+                error: safeSerializeSmtpError(err),
+              }
+            : undefined,
       });
     }
 

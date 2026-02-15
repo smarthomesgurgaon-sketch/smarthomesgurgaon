@@ -147,12 +147,19 @@ export default function AvaniGreensApplyPage() {
           : step2Data.coApplicantPhone,
         documents,
       };
+
+      // Send as multipart so server can attach real files (no base64 on mobile)
+      const formData = new FormData();
+      formData.append("payload", JSON.stringify(payload));
+      if (docFiles.aadhaarCard?.file) formData.append("aadhaarCard", docFiles.aadhaarCard.file);
+      if (docFiles.panCard?.file) formData.append("panCard", docFiles.panCard.file);
+      if (docFiles.photo?.file) formData.append("photo", docFiles.photo.file);
+      if (docFiles.cancelledCheque?.file) formData.append("cancelledCheque", docFiles.cancelledCheque.file);
       const controller = new AbortController();
       const fetchTimer = window.setTimeout(() => controller.abort(), 45000);
       const res = await fetch("/api/send-lead", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        body: formData,
         signal: controller.signal,
       });
       window.clearTimeout(fetchTimer);
