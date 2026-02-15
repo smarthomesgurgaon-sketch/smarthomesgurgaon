@@ -173,13 +173,8 @@ export default function AvaniGreensApplyPage() {
       setErrorMsg("Please enter Son/Wife/Daughter/Of.");
       return;
     }
-    const dob = trim(step2Data.dateOfBirth);
-    if (!dob) {
-      setErrorMsg("Please enter Date of Birth (YYYY-MM-DD).");
-      return;
-    }
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(dob)) {
-      setErrorMsg("Please enter Date of Birth in YYYY-MM-DD format.");
+    if (!trim(step2Data.dateOfBirth)) {
+      setErrorMsg("Please enter Date of Birth.");
       return;
     }
     if (!trim(step2Data.gender)) {
@@ -587,11 +582,9 @@ export default function AvaniGreensApplyPage() {
                         <label>Date of Birth *</label>
                         <input
                           name="dateOfBirth"
-                          type="text"
-                          inputMode="numeric"
+                          type="date"
                           value={step2Data.dateOfBirth}
                           onChange={handleStep2Change}
-                          placeholder="YYYY-MM-DD"
                         />
                       </div>
                       <div className="apply-form-group">
